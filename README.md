@@ -2,6 +2,7 @@
 
 ## Requirements
 ```python
+git clone git@github.com:armanheidarii/JetCert.git
 pip install -r requirements.txt
 ```
 
