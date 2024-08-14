@@ -3,11 +3,10 @@ import sys
 sys.path.append(".")
 
 import json
+import sqlite3
 
-# from werkzeug.security import generate_password_hash, check_password_hash
-
-from app import app
-from db import User, email_len, password_len
+email_len = 70
+password_len = 80
 
 
 def eprint(*args, **kwargs):
@@ -33,18 +32,22 @@ if len(password) > password_len:
     eprint("Your email is invalid!")
     exit(0)
 
-with app.app_context():
-    user = User.query.filter_by(email=email).first()
+db_path = "/home/arman/develop/compiler-artifact/jetCert/db/instance/Database.db"
+connection = sqlite3.connect(db_path)
+cur = connection.cursor()
+
+user = cur.execute("SELECT * from USER WHERE Email = ?", [email]).fetchone()
 
 if not user:
     print(json.dumps({"login": False}))
     eprint("The user with the given email address was not found!")
     exit(0)
 
-# if check_password_hash(user.password, auth.get("password")):
-if user.password != password:
+if user[4] != password:
     print(json.dumps({"login": False}))
     eprint("Your password was not match!")
     exit(0)
 
 print(json.dumps({"login": True}))
+
+connection.close()

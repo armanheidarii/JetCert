@@ -1,8 +1,13 @@
-#include "../../../../tools/cJSON/cJSON.h"
+// #include "../../../../tools/C-Simple-JSON-Parser/json.h"
+#include <json-c/json.h>
+#include <json-c/json_object.h>
 #include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define FALSE 0
+#define TRUE 1
 
 int query_len = 1024;
 
@@ -26,7 +31,8 @@ struct User {
 };
 
 char *inputString(FILE *fp, size_t size);
-cJSON *get_json_inputs();
+json_object *get_json_inputs();
+const char *get_json_value(json_object *json, char *key);
 static int callback(void *data, int argc, char **argv, char **azColName);
 
 int main(int argc, char *argv[]) {
@@ -43,29 +49,23 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  cJSON *inputs = get_json_inputs();
-  cJSON *outputs = cJSON_CreateObject();
+  json_object *inputs = get_json_inputs();
+  json_object *outputs = json_object_new_object();
 
-  char *email;
-  cJSON *email_json = cJSON_GetObjectItemCaseSensitive(inputs, "email");
-  if (cJSON_IsString(email_json) && (email_json->valuestring != NULL))
-    email = email_json->valuestring;
+  const char *email = get_json_value(inputs, "email");
 
   if (strlen(email) > email_len) {
-    cJSON_AddFalseToObject(outputs, "login");
-    fprintf(stdout, "%s", cJSON_Print(outputs));
+    json_object_object_add(outputs, "login", json_object_new_boolean(FALSE));
+    fprintf(stdout, "%s", json_object_to_json_string(outputs));
     fprintf(stderr, "Your email is invalid!");
     return 0;
   }
 
-  char *password;
-  cJSON *password_json = cJSON_GetObjectItemCaseSensitive(inputs, "password");
-  if (cJSON_IsString(password_json) && (password_json->valuestring != NULL))
-    password = password_json->valuestring;
+  const char *password = get_json_value(inputs, "password");
 
   if (strlen(password) > password_len) {
-    cJSON_AddFalseToObject(outputs, "login");
-    fprintf(stdout, "%s", cJSON_Print(outputs));
+    json_object_object_add(outputs, "login", json_object_new_boolean(FALSE));
+    fprintf(stdout, "%s", json_object_to_json_string(outputs));
     fprintf(stderr, "Your password is invalid!");
     return 0;
   }
@@ -80,24 +80,26 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "SQL error: %s\n", zErrMsg);
     sqlite3_free(zErrMsg);
     return 1;
-  } else {
-    if (!user) {
-      cJSON_AddFalseToObject(outputs, "login");
-      fprintf(stdout, "%s", cJSON_Print(outputs));
-      fprintf(stderr, "The user with the given email address was not found!");
-      return 0;
-    }
-
-    if (strcmp(user->password, password)) {
-      cJSON_AddFalseToObject(outputs, "login");
-      fprintf(stdout, "%s", cJSON_Print(outputs));
-      fprintf(stderr, "Your password was not match!");
-      return 0;
-    }
-
-    cJSON_AddTrueToObject(outputs, "login");
-    fprintf(stdout, "%s", cJSON_Print(outputs));
   }
+
+  if (!user) {
+    json_object_object_add(outputs, "login", json_object_new_boolean(FALSE));
+    fprintf(stdout, "%s", json_object_to_json_string(outputs));
+    fprintf(stderr, "The user with the given email address was not found!");
+    return 0;
+  }
+
+  if (strcmp(user->password, password)) {
+    json_object_object_add(outputs, "login", json_object_new_boolean(FALSE));
+    fprintf(stdout, "%s", json_object_to_json_string(outputs));
+    fprintf(stderr, "Your password was not match!");
+    return 0;
+  }
+
+  json_object_object_add(outputs, "login", json_object_new_boolean(TRUE));
+  fprintf(stdout, "%s",
+          json_object_to_json_string_ext(outputs, JSON_C_TO_STRING_SPACED |
+                                                      JSON_C_TO_STRING_PRETTY));
 
   sqlite3_close(db);
   return 0;
@@ -123,18 +125,25 @@ char *inputString(FILE *fp, size_t size) {
   return realloc(str, sizeof(*str) * len);
 }
 
-cJSON *get_json_inputs() {
-  char *buffer = inputString(stdin, 10);
-  cJSON *json = cJSON_Parse(buffer);
-  if (json == NULL) {
-    const char *error_ptr = cJSON_GetErrorPtr();
-    if (error_ptr != NULL) {
-      fprintf(stderr, "Error: %s\n", error_ptr);
-    }
-    cJSON_Delete(json);
-    exit(1);
-  }
-  return json;
+json_object *get_json_inputs() {
+  char *inputs_str = inputString(stdin, 10);
+  json_object *inputs = json_tokener_parse(inputs_str);
+  return inputs;
+}
+
+const char *get_json_value(json_object *json, char *key) {
+  json_object *value;
+
+  json_object_object_get_ex(json, key, &value);
+
+  const char *value_str = json_object_to_json_string(value);
+
+  int n = strlen(value_str) - 2;
+  char *value_str_trim = (char *)malloc(n * sizeof(char));
+  strncpy(value_str_trim, value_str + 1, n);
+  value_str_trim[n] = '\0';
+
+  return value_str_trim;
 }
 
 static int callback(void *data, int argc, char **argv, char **azColName) {
