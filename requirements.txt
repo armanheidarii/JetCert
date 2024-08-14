@@ -5,3 +5,4 @@ jwt
 Flask-RESTful
 PyJWT
 Flask-SQLAlchemy
+sqlite3
