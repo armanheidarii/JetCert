@@ -68,7 +68,7 @@ class Builder:
         file_paths = self.module.get_state_files_path("safe")
         for file_path in file_paths:
 
-            base_cmd = ["gcc", "tools/cJSON/cJSON.c", f"{file_path}.c"]
+            base_cmd = ["gcc", f"{file_path}.c"]
             linked_cmd = [
                 f"-l{linked_file}" for linked_file in self.module.c_linked_files
             ]
@@ -103,11 +103,10 @@ class Module:
         self.fast_compilation_tool = fast_compilation_tool
         self.c_entry_file_name = c_entry_file_name
         self.c_linked_files = c_linked_files
-        self.is_ready_flag = True
+        self.is_ready_flag = False
         self.is_active_flag = True
         self.safety = {"state": "safe", "level": 1}
         self.builder = Builder.create(self)
-        self.module_lock = threading.Lock()
 
     def create(
         system,
@@ -214,47 +213,16 @@ class Module:
             traceback.print_exc()
             return None
 
-    def monitor(self):
-        try:
-            monitor_file_path = self.get_mape_file_path("monitor")
-            response = Builder.run_python_file(monitor_file_path)
-            return response.get("result")
-
-        except:
-            traceback.print_exc()
-            return None
-
-    def analyse(self, monitor_data):
-        try:
-            analyse_file_path = self.get_mape_file_path("analyse")
-            response = Builder.run_python_file(analyse_file_path, inputs=monitor_data)
-            return response.get("result")
-
-        except:
-            traceback.print_exc()
-            return None
-
-    def planning(self, analyse_data):
-        try:
-            planning_file_path = self.get_mape_file_path("planning")
-            response = Builder.run_python_file(planning_file_path, inputs=analyse_data)
-            return response.get("result")
-
-        except:
-            traceback.print_exc()
-            return None
-
     def execute(self, planning_data):
         try:
-            self.module_lock.acquire()
             self.safety = planning_data
-            self.module_lock.release()
 
         except:
             traceback.print_exc()
 
     def get_module_path(self):
-        return f"{self.system.modules_path}/{self.module_name}"
+        modules_path = self.system.get_modules_path()
+        return f"{modules_path}/{self.module_name}"
 
     def get_state_path(self, safety_state):
         module_path = self.get_module_path()
@@ -284,10 +252,6 @@ class Module:
                 state_levels_path.append(f"{file_path}")
         return state_levels_path
 
-    def get_mape_file_path(self, file_name):
-        module_path = self.get_module_path()
-        return f"{module_path}/MAPE/{file_name}.py"
-
     def __str__(self):
         safety = self.safety.copy()
         safety_state = safety.get("state")
@@ -315,6 +279,9 @@ class JetCert:
             traceback.print_exc()
             return None
 
+    # jetCert_setup beshe JetCert/__init__
+    # havaset bashe agar kharej az zaman mored nazar start zad return False beshe hamintor stop va...
+    # betoone bish az yekbar start va stop bezane
     def start(self):
         try:
             self.MAPE.start()
@@ -349,6 +316,7 @@ class JetCert:
             traceback.print_exc()
             return None
 
+    # gozine options ham bezar maslan mesl -fstruct baraye ccomp
     def add_module(
         self,
         module_name,
@@ -378,14 +346,11 @@ class JetCert:
             )
 
             self.modules[module_name] = module
-
-            if self.is_start():
-                self.pending_modules.append(module_name)
-                module.is_ready_flag = False
+            self.pending_modules.append(module_name)
 
             self.lock.release()
 
-            while wait_to_ready and not module.is_ready():
+            while self.is_start() and wait_to_ready and not module.is_ready():
                 pass
 
             return module
@@ -426,6 +391,9 @@ class JetCert:
             traceback.print_exc()
             return None
 
+    def get_modules_path(self):
+        return self.modules_path
+
 
 class MAPE:
     def __init__(self, system, period=60):
@@ -442,6 +410,13 @@ class MAPE:
         return MAPE(system, period=period)
 
     def start(self):
+        monitor = self.monitor()
+        analyse = self.analyse(monitor)
+        planning = self.planning(analyse)
+        self.execute(planning)
+
+        self.flush_pending_modules()
+
         self.MAPE_thread.start()
         self.is_start_flag = True
 
@@ -453,6 +428,47 @@ class MAPE:
 
     def is_stop(self):
         return self.is_stop_flag
+
+    def monitor(self):
+        try:
+            monitor_file_path = self.get_mape_file_path("monitor")
+            response = Builder.run_python_file(monitor_file_path)
+            return response.get("result")
+
+        except:
+            traceback.print_exc()
+            return None
+
+    def analyse(self, monitor_data):
+        try:
+            analyse_file_path = self.get_mape_file_path("analyse")
+            response = Builder.run_python_file(analyse_file_path, inputs=monitor_data)
+            return response.get("result")
+
+        except:
+            traceback.print_exc()
+            return None
+
+    def planning(self, analyse_data):
+        try:
+            planning_file_path = self.get_mape_file_path("planning")
+            response = Builder.run_python_file(planning_file_path, inputs=analyse_data)
+            return response.get("result")
+
+        except:
+            traceback.print_exc()
+            return None
+
+    def execute(self, planning_data):
+        try:
+            for module_name, data in planning_data.items():
+                module = self.system.modules.get(module_name)
+                if module != None:
+                    module.execute(data)
+
+        except:
+            traceback.print_exc()
+            return None
 
     def flush_pending_modules(self):
         self.system.lock.acquire()
@@ -473,13 +489,12 @@ class MAPE:
 
                 print(f"start MAPE round {i}")
 
-                self.flush_pending_modules()
+                monitor = self.monitor()
+                analyse = self.analyse(monitor)
+                planning = self.planning(analyse)
+                self.execute(planning)
 
-                for module_name, module in self.system.modules.items():
-                    monitor = module.monitor()
-                    analyse = module.analyse(monitor)
-                    planning = module.planning(analyse)
-                    module.execute(planning)
+                self.flush_pending_modules()
 
                 print(f"finish MAPE round {i}")
                 i += 1
@@ -490,3 +505,7 @@ class MAPE:
 
             traceback.print_exc()
             return None
+
+    def get_mape_file_path(self, file_name):
+        modules_path = self.system.get_modules_path()
+        return f"{modules_path}/MAPE/{file_name}.py"
