@@ -7,8 +7,7 @@ import json
 from datetime import datetime, timedelta
 import jwt
 from flask import request, jsonify, make_response
-from app import app
-from app.jetCert_setup import Login
+from app import app, Login
 
 
 # decorator for verifying the user
