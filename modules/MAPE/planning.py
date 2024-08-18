@@ -4,12 +4,8 @@ import random
 print(
     json.dumps(
         {
-            "login": (
-                {"state": "safe", "level": 1}
-                if random.randint(0, 1)
-                else {"state": "fast", "level": 1}
-            ),
-            "crypto": {"state": "fast", "level": 1},
+            "login": {"state": "safe" if random.randint(0, 1) else "fast", "level": 1},
+            "cryptography": {"state": "safe", "level": random.randint(1, 4)},
         }
     )
 )

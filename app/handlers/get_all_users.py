@@ -2,7 +2,7 @@
 from db import db, User, email_len, password_len
 
 from flask import request, jsonify, make_response
-from app import app
+from app import app, Crypto
 from app.middlewares.login import login
 
 
@@ -24,7 +24,11 @@ def get_all_users(is_login):
         # appending the user data json
         # to the response list
         output.append(
-            {"public_id": user.public_id, "name": user.name, "email": user.email}
+            {
+                "public_id": user.public_id,
+                "name": user.name,
+                "email": Crypto.run(inputs={"plaintext": user.email}).get("result"),
+            }
         )
 
     return jsonify({"users": output})
