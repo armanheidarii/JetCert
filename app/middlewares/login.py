@@ -26,7 +26,6 @@ def login(f):
 
         response = Login.run(inputs={"email": email, "password": password})
 
-        print(response)
         is_login = response.get("result").get("login")
         return f(is_login, *args, **kwargs)
 

@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   sqlite3 *db;
   char *zErrMsg = 0;
   int rc;
-  char *sql = malloc(query_len * sizeof(char));
+  char *sql = calloc(query_len + 1, sizeof(char));
   const char *data = "Callback function called";
 
   /* Open database */
@@ -139,9 +139,8 @@ const char *get_json_value(json_object *json, char *key) {
   const char *value_str = json_object_to_json_string(value);
 
   int n = strlen(value_str) - 2;
-  char *value_str_trim = (char *)malloc(n * sizeof(char));
+  char *value_str_trim = (char *)calloc(n + 1, sizeof(char));
   strncpy(value_str_trim, value_str + 1, n);
-  value_str_trim[n] = '\0';
 
   return value_str_trim;
 }
@@ -150,19 +149,19 @@ static int callback(void *data, int argc, char **argv, char **azColName) {
   if (argc > 0) {
     user = (struct User *)malloc(sizeof(struct User));
 
-    user->id = malloc(id_len * sizeof(char));
+    user->id = calloc(id_len + 1, sizeof(char));
     strcpy(user->id, argv[0]);
 
-    user->public_id = malloc(public_id_len * sizeof(char));
+    user->public_id = calloc(public_id_len + 1, sizeof(char));
     strcpy(user->public_id, argv[1]);
 
-    user->name = malloc(name_len * sizeof(char));
+    user->name = calloc(name_len + 1, sizeof(char));
     strcpy(user->name, argv[2]);
 
-    user->email = malloc(email_len * sizeof(char));
+    user->email = calloc(email_len + 1, sizeof(char));
     strcpy(user->email, argv[3]);
 
-    user->password = malloc(password_len * sizeof(char));
+    user->password = calloc(password_len + 1, sizeof(char));
     strcpy(user->password, argv[4]);
   }
 
