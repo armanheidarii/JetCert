@@ -1,3 +1,4 @@
+#include <json-c/json.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,27 +99,37 @@ uint64_t key[3] = {0x9474B8E8C73BCA7D, 0x9474B8E8C73BCA7C, 0x9474B8E8C73BC97D};
 uint64_t block_size = 16;
 
 char *inputString(FILE *fp, size_t size);
+json_object *get_json_inputs();
+const char *get_json_value(json_object *json, char *key);
 uint64_t hex_to_uint64(char *hex_str);
 char *hex_to_ascii(char *hex_str);
-char *ascii_to_hex(char *msg);
+char *ascii_to_hex(const char *msg);
 char *trim_trailing_zeros(char *hex);
 char *padding(char *msg_hex);
 uint64_t des(uint64_t input, uint64_t key, char mode);
 char *encrypt_block(char *msg_block, char mode);
-char *encrypt_worker(char *msg, char mode);
-char *encrypt(char *msg);
+char *encrypt_worker(const char *msg, char mode);
+char *encrypt(const char *msg);
 char *decrypt(char *cipher);
 
 int main(int argc, const char *argv[]) {
-  char *msg = inputString(stdin, 10);
+  json_object *inputs = get_json_inputs();
+  const char *msg = get_json_value(inputs, "plaintext");
 
   char *cipher = encrypt(msg);
-  printf("%s\n", cipher);
+
+  json_object *outputs = json_object_new_object();
+  json_object_object_add(outputs, "algorithm", json_object_new_string("3_DES"));
+  json_object_object_add(outputs, "ciphertext", json_object_new_string(cipher));
+
+  fprintf(stdout, "%s",
+          json_object_to_json_string_ext(outputs, JSON_C_TO_STRING_SPACED |
+                                                      JSON_C_TO_STRING_PRETTY));
 
   // Decrypt
-  // printf("%s", decrypt(cipher));
+  // fprintf(stdout, "\n%s", decrypt(cipher));
 
-  free(msg);
+  free((void *)msg);
   free(cipher);
 
   return 0;
@@ -142,6 +153,26 @@ char *inputString(FILE *fp, size_t size) {
   str[len++] = '\0';
 
   return realloc(str, sizeof(*str) * len);
+}
+
+json_object *get_json_inputs() {
+  char *inputs_str = inputString(stdin, 10);
+  json_object *inputs = json_tokener_parse(inputs_str);
+  return inputs;
+}
+
+const char *get_json_value(json_object *json, char *key) {
+  json_object *value;
+
+  json_object_object_get_ex(json, key, &value);
+
+  const char *value_str = json_object_to_json_string(value);
+
+  int n = strlen(value_str) - 2;
+  char *value_str_trim = (char *)calloc(n + 1, sizeof(char));
+  strncpy(value_str_trim, value_str + 1, n);
+
+  return value_str_trim;
 }
 
 uint64_t hex_to_uint64(char *hex_str) {
@@ -180,7 +211,7 @@ uint64_t hex_to_uint64(char *hex_str) {
 
 char *hex_to_ascii(char *hex_str) {
   size_t length = strlen(hex_str);
-  char *ascii_str = (char *)malloc((length / 2) + 1);
+  char *ascii_str = (char *)calloc((length / 2) + 1, sizeof(char));
   if (length % 2 != 0) {
     printf("Invalid hex string length.\n");
     return NULL;
@@ -200,9 +231,9 @@ char *hex_to_ascii(char *hex_str) {
 }
 
 // function to convert ascii char* to hex-string (char*)
-char *ascii_to_hex(char *msg) {
+char *ascii_to_hex(const char *msg) {
   int len = strlen(msg);
-  char *msg_hex = (char *)malloc(sizeof(char) * (len * 2) + 1);
+  char *msg_hex = (char *)calloc((len * 2) + 1, sizeof(char));
 
   int loop;
   int i;
@@ -238,7 +269,7 @@ char *padding(char *msg_hex) {
 
   int padding_len = block_size - (msg_hex_len % block_size);
   char *msg_padding =
-      (char *)malloc(sizeof(char) * (msg_hex_len + padding_len));
+      (char *)calloc((msg_hex_len + padding_len) + 1, sizeof(char));
   strcpy(msg_padding, msg_hex);
 
   for (int i = 0; i < padding_len; i++)
@@ -385,14 +416,14 @@ char *encrypt_block(char *msg_block, char mode) {
   result = des(result, key1, mode1);
   result = des(result, key2, mode2);
 
-  char *result_str = (char *)malloc(sizeof(char) * block_size);
+  char *result_str = (char *)calloc(block_size + 1, sizeof(char));
   sprintf(result_str, "%016lx", result);
 
   return result_str;
 }
 
-char *encrypt_worker(char *msg, char mode) {
-  char *msg_hex = (char *)malloc(sizeof(char) * strlen(msg));
+char *encrypt_worker(const char *msg, char mode) {
+  char *msg_hex = (char *)calloc(strlen(msg) + 1, sizeof(char));
   strcpy(msg_hex, msg);
 
   if (mode == 'e')
@@ -400,9 +431,9 @@ char *encrypt_worker(char *msg, char mode) {
 
   char *msg_padding = padding(msg_hex);
 
-  char *cipher = (char *)malloc(sizeof(char) * strlen(msg_padding));
+  char *cipher = (char *)calloc(strlen(msg_padding) + 1, sizeof(char));
 
-  char *msg_block = (char *)malloc(sizeof(char) * block_size);
+  char *msg_block = (char *)calloc(block_size + 1, sizeof(char));
   for (int i = 0; i < strlen(msg_padding); i += block_size) {
     strncpy(msg_block, msg_padding + i, block_size);
     strcat(cipher, encrypt_block(msg_block, mode));
@@ -414,6 +445,6 @@ char *encrypt_worker(char *msg, char mode) {
   return cipher;
 }
 
-char *encrypt(char *msg) { return encrypt_worker(msg, 'e'); }
+char *encrypt(const char *msg) { return encrypt_worker(msg, 'e'); }
 
 char *decrypt(char *cipher) { return encrypt_worker(cipher, 'd'); }

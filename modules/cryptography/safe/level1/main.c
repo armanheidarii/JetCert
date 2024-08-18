@@ -1,25 +1,32 @@
-#include "../../../../tools/cJSON/cJSON.h"
+#include <json-c/json.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 char *inputString(FILE *fp, size_t size);
-cJSON *get_json_inputs();
-char *encrypt(char *msg);
-char *decrypt(char *cipher);
+json_object *get_json_inputs();
+const char *get_json_value(json_object *json, char *key);
+char *encrypt(const char *msg);
+char *decrypt(char *msg);
 
 int main(int argc, const char *argv[]) {
-  cJSON *json = get_json_inputs();
-  char *msg = cJSON_GetObjectItemCaseSensitive(json, "plaintext")->valuestring;
+  json_object *inputs = get_json_inputs();
+  const char *msg = get_json_value(inputs, "plaintext");
 
   char *cipher = encrypt(msg);
-  printf("%s\n", cipher);
+
+  json_object *outputs = json_object_new_object();
+  json_object_object_add(outputs, "algorithm", json_object_new_string("same"));
+  json_object_object_add(outputs, "ciphertext", json_object_new_string(cipher));
+
+  fprintf(stdout, "%s",
+          json_object_to_json_string_ext(outputs, JSON_C_TO_STRING_SPACED |
+                                                      JSON_C_TO_STRING_PRETTY));
 
   // Decrypt
-  // printf("%s", decrypt(cipher));
+  // fprintf(stdout, "\n%s", decrypt(cipher));
 
-  cJSON_Delete(json);
-  free(msg);
+  free((void *)msg);
   free(cipher);
 
   return 0;
@@ -45,29 +52,35 @@ char *inputString(FILE *fp, size_t size) {
   return realloc(str, sizeof(*str) * len);
 }
 
-cJSON *get_json_inputs() {
-  char *buffer = inputString(stdin, 10);
-  cJSON *json = cJSON_Parse(buffer);
-  if (json == NULL) {
-    const char *error_ptr = cJSON_GetErrorPtr();
-    if (error_ptr != NULL) {
-      printf("Error: %s\n", error_ptr);
-    }
-    cJSON_Delete(json);
-    exit(1);
-  }
-  return json;
+json_object *get_json_inputs() {
+  char *inputs_str = inputString(stdin, 10);
+  json_object *inputs = json_tokener_parse(inputs_str);
+  return inputs;
 }
 
-char *encrypt(char *msg) {
-  char *cipher = (char *)malloc(sizeof(char) * strlen(msg));
+const char *get_json_value(json_object *json, char *key) {
+  json_object *value;
+
+  json_object_object_get_ex(json, key, &value);
+
+  const char *value_str = json_object_to_json_string(value);
+
+  int n = strlen(value_str) - 2;
+  char *value_str_trim = (char *)calloc(n + 1, sizeof(char));
+  strncpy(value_str_trim, value_str + 1, n);
+
+  return value_str_trim;
+}
+
+char *encrypt(const char *msg) {
+  char *cipher = (char *)calloc(strlen(msg) + 1, sizeof(char));
   strcpy(cipher, msg);
 
   return cipher;
 }
 
 char *decrypt(char *cipher) {
-  char *msg = (char *)malloc(sizeof(char) * strlen(cipher));
+  char *msg = (char *)calloc(strlen(cipher) + 1, sizeof(char));
   strcpy(msg, cipher);
 
   return msg;
