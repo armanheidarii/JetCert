@@ -410,12 +410,16 @@ class MAPE:
         return MAPE(system, period=period)
 
     def start(self):
+        print(f"start MAPE round 0")
+
         monitor = self.monitor()
         analyse = self.analyse(monitor)
         planning = self.planning(analyse)
         self.execute(planning)
 
         self.flush_pending_modules()
+
+        print(f"finish MAPE round 0")
 
         self.MAPE_thread.start()
         self.is_start_flag = True
