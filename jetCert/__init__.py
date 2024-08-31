@@ -15,16 +15,88 @@ class Builder:
     def create(module):
         return Builder(module)
 
-    def is_json(input_string):
+    def is_json(input_obj):
         try:
-            json.loads(input_string)
+            if type(input_obj) == str:
+                json.loads(input_obj)
+
+            else:
+                json.dumps(input_obj)
+
             return True
-        except json.JSONDecodeError:
+
+        except:
             return False
+
+    def importer(name, root_package=False, relative_globals=None, level=0):
+        """We only import modules, functions can be looked up on the module.
+        Usage:
+
+        from foo.bar import baz
+        >>> baz = importer('foo.bar.baz')
+
+        import foo.bar.baz
+        >>> foo = importer('foo.bar.baz', root_package=True)
+        >>> foo.bar.baz
+
+        from .. import baz (level = number of dots)
+        >>> baz = importer('baz', relative_globals=globals(), level=2)
+        """
+
+        try:
+            return __import__(
+                name,
+                locals=None,
+                globals=relative_globals,
+                fromlist=[] if root_package else [None],
+                level=level,
+            )
+
+        except:
+            traceback.print_exc()
+            return None
+
+    def compile_numba_versions(self):
+        files_path = self.module.get_numba_files_path()
+        for name, file_path in files_path.items():
+            numba_entry_module = Builder.importer(file_path)
+            numba_entry_function = getattr(
+                numba_entry_module, self.module.fast_numba_entry_func_name
+            )
+
+            self.module.numba_cache_functions[name] = numba_entry_function
+
+    def compile_codon_versions(self):
+        files_path = self.module.get_state_files_path("fast")
+        for file_path in files_path:
+            base_cmd = ["codon", "build", "-release", "-exe", f"{file_path}.py"]
+            response = Builder.run_cmd(base_cmd)
+
+            print(response)
+
+    def compile_fast_versions(self):
+        if self.module.fast_compilation_tool == "numba":
+            self.compile_numba_versions()
+        elif self.module.fast_compilation_tool == "codon":
+            self.compile_codon_versions()
+
+    def compile_safe_versions(self):
+        files_path = self.module.get_state_files_path("safe")
+        for name, file_path in files_path.items():
+
+            base_cmd = ["gcc", f"{file_path}.c"]
+            linked_cmd = [
+                f"-l{linked_file}" for linked_file in self.module.safe_linked_files
+            ]
+            output_cmd = ["-o", file_path]
+            cmd = base_cmd + linked_cmd + output_cmd
+            response = Builder.run_cmd(cmd)
+
+            print(response)
 
     def run_cmd(cmd, inputs=None):
         if inputs != None:
-            inputs = f"{json.dumps(inputs)}"
+            inputs = json.dumps(inputs) if Builder.is_json(inputs) else f"{inputs}"
 
         completed_process = subprocess.run(
             cmd, input=inputs, capture_output=True, text=True
@@ -55,8 +127,27 @@ class Builder:
             "result": (json.loads(stdout) if Builder.is_json(stdout) else stdout),
         }
 
-    def run_numba_file(file_path, inputs=None):
-        response = Builder.run_cmd(["numba", file_path], inputs=inputs)
+    def run_numba_file(self, name, inputs=None):
+        response = {}
+
+        try:
+            response["returncode"] = 0
+            stdout = (
+                self.module.numba_cache_functions.get(name)()
+                if inputs == None
+                else self.module.numba_cache_functions.get(name)(inputs)
+            )
+            response["stdout"] = (
+                json.dumps(stdout) if Builder.is_json(stdout) else f"{stdout}"
+            )
+            response["stderr"] = ""
+
+        except:
+            response["returncode"] = 1
+            response["stdout"] = ""
+            response["stderr"] = traceback.format_exc()
+
+        response["args"] = "JIT execution"
 
         stdout = response.get("stdout")
         return {
@@ -64,57 +155,39 @@ class Builder:
             "result": (json.loads(stdout) if Builder.is_json(stdout) else stdout),
         }
 
-    def compile_safe_versions(self):
-        file_paths = self.module.get_state_files_path("safe")
-        for file_path in file_paths:
-
-            base_cmd = ["gcc", f"{file_path}.c"]
-            linked_cmd = [
-                f"-l{linked_file}" for linked_file in self.module.c_linked_files
-            ]
-            output_cmd = ["-o", file_path]
-            cmd = base_cmd + linked_cmd + output_cmd
-            response = Builder.run_cmd(cmd)
-
-            print(response)
-
-    def compile_fast_versions(self):
-        file_paths = self.module.get_state_files_path("fast")
-        for file_path in file_paths:
-            base_cmd = ["codon", "build", "-release", "-exe", f"{file_path}.py"]
-            response = Builder.run_cmd(base_cmd)
-
-            print(response)
-
 
 class Module:
     def __init__(
         self,
         system,
         module_name,
-        python_entry_file_name="__main__",
         fast_compilation_tool="python",
-        c_entry_file_name="main",
-        c_linked_files=[],
+        fast_entry_file_name="__main__",
+        fast_numba_entry_func_name="go_fast",
+        safe_entry_file_name="main",
+        safe_linked_files=[],
     ):
         self.system = system
         self.module_name = module_name
-        self.python_entry_file_name = python_entry_file_name
         self.fast_compilation_tool = fast_compilation_tool
-        self.c_entry_file_name = c_entry_file_name
-        self.c_linked_files = c_linked_files
+        self.fast_entry_file_name = fast_entry_file_name
+        self.fast_numba_entry_func_name = fast_numba_entry_func_name
+        self.safe_entry_file_name = safe_entry_file_name
+        self.safe_linked_files = safe_linked_files
         self.is_ready_flag = False
         self.is_active_flag = True
         self.safety = {"state": "safe", "level": 1}
+        self.numba_cache_functions = {}
         self.builder = Builder.create(self)
 
     def create(
         system,
         module_name,
-        python_entry_file_name="__main__",
         fast_compilation_tool="python",
-        c_entry_file_name="main",
-        c_linked_files=[],
+        fast_entry_file_name="__main__",
+        fast_numba_entry_func_name="go_fast",
+        safe_entry_file_name="main",
+        safe_linked_files=[],
     ):
 
         if not fast_compilation_tool in Builder.fast_compilation_tools:
@@ -123,16 +196,15 @@ class Module:
         module = Module(
             system,
             module_name,
-            python_entry_file_name=python_entry_file_name,
             fast_compilation_tool=fast_compilation_tool,
-            c_entry_file_name=c_entry_file_name,
-            c_linked_files=c_linked_files,
+            fast_entry_file_name=fast_entry_file_name,
+            fast_numba_entry_func_name=fast_numba_entry_func_name,
+            safe_entry_file_name=safe_entry_file_name,
+            safe_linked_files=safe_linked_files,
         )
 
+        module.builder.compile_fast_versions()
         module.builder.compile_safe_versions()
-
-        if module.fast_compilation_tool == "codon":
-            module.builder.compile_fast_versions()
 
         return module
 
@@ -184,25 +256,28 @@ class Module:
                 return None
 
             safety = self.safety.copy()
-            file_path = self.get_file_path(safety.get("state"), safety.get("level"))
+            safety_state = safety.get("state")
+            safety_level = safety.get("level")
+
+            file_path = self.get_file_path(safety_state, safety_level)
 
             response = None
-            if safety.get("state") == "fast":
+            if safety_state == "fast":
 
                 if self.fast_compilation_tool == "numba":
-                    response = Builder.run_numba_file(
-                        f"{file_path}.py", inputs=inputs
+                    response = self.builder.run_numba_file(
+                        f"level{safety_level}", inputs=inputs
                     ).copy()
 
-                if self.fast_compilation_tool == "codon":
+                elif self.fast_compilation_tool == "codon":
                     response = Builder.run_exe_file(file_path, inputs=inputs).copy()
 
-                if self.fast_compilation_tool == "python":
+                elif self.fast_compilation_tool == "python":
                     response = Builder.run_python_file(
                         f"{file_path}.py", inputs=inputs
                     ).copy()
 
-            elif safety.get("state") == "safe":
+            elif safety_state == "safe":
                 response = Builder.run_exe_file(file_path, inputs=inputs).copy()
 
             response["safety"] = safety
@@ -235,22 +310,29 @@ class Module:
     def get_file_path(self, safety_state, safety_level):
         level_path = self.get_level_path(safety_state, safety_level)
         entry_file_name = (
-            self.python_entry_file_name
+            self.fast_entry_file_name
             if safety_state == "fast"
-            else self.c_entry_file_name
+            else self.safe_entry_file_name
         )
         return f"{level_path}/{entry_file_name}"
 
     def get_state_files_path(self, safety_state):
         state_path = self.get_state_path(safety_state)
-        state_levels_path = []
+        state_levels_path = {}
         for name in os.listdir(state_path):
             if name.startswith("level"):
                 file_path = self.get_file_path(
                     safety_state, int(name[name.rfind("l") + 1 :])
                 )
-                state_levels_path.append(f"{file_path}")
+                state_levels_path[name] = file_path
+
         return state_levels_path
+
+    def get_numba_files_path(self):
+        return {
+            name: file_path.replace("/", ".")
+            for name, file_path in self.get_state_files_path("fast").items()
+        }
 
     def __str__(self):
         safety = self.safety.copy()
@@ -279,9 +361,6 @@ class JetCert:
             traceback.print_exc()
             return None
 
-    # jetCert_setup beshe JetCert/__init__
-    # havaset bashe agar kharej az zaman mored nazar start zad return False beshe hamintor stop va...
-    # betoone bish az yekbar start va stop bezane
     def start(self):
         try:
             self.MAPE.start()
@@ -316,14 +395,14 @@ class JetCert:
             traceback.print_exc()
             return None
 
-    # gozine options ham bezar maslan mesl -fstruct baraye ccomp
     def add_module(
         self,
         module_name,
-        python_entry_file_name="__main__",
         fast_compilation_tool="python",
-        c_entry_file_name="main",
-        c_linked_files=[],
+        fast_entry_file_name="__main__",
+        fast_numba_entry_func_name="go_fast",
+        safe_entry_file_name="main",
+        safe_linked_files=[],
         wait_to_ready=False,
     ):
         try:
@@ -339,10 +418,11 @@ class JetCert:
             module = Module.create(
                 self,
                 module_name,
-                python_entry_file_name=python_entry_file_name,
                 fast_compilation_tool=fast_compilation_tool,
-                c_entry_file_name=c_entry_file_name,
-                c_linked_files=c_linked_files,
+                fast_entry_file_name=fast_entry_file_name,
+                fast_numba_entry_func_name=fast_numba_entry_func_name,
+                safe_entry_file_name=safe_entry_file_name,
+                safe_linked_files=safe_linked_files,
             )
 
             self.modules[module_name] = module
@@ -512,4 +592,4 @@ class MAPE:
 
     def get_mape_file_path(self, file_name):
         modules_path = self.system.get_modules_path()
-        return f"{modules_path}/MAPE/{file_name}.py"
+        return f"{modules_path}/__MAPE__/{file_name}.py"
