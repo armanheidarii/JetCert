@@ -26,8 +26,6 @@ Crypto = jet_cert.add_module(
 )
 
 print(jet_cert.get_module("login"))
-print(jet_cert.get_all_modules())
-
 print(jet_cert.get_module("cryptography"))
 print(jet_cert.get_all_modules())
 
