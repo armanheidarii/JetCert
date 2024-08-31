@@ -4,3 +4,4 @@ __pycache__
 instance
 main
 __main__
+.env
