@@ -1,28 +1,30 @@
 # Database ORMs
-from db import db, User, email_len, password_len
+from db import db, User
 
-from flask import request, jsonify, make_response
+# App Packages
+from flask import request, make_response
 from app import app, Crypto
-from app.middlewares.login import login
+from app.middlewares.login import admin_login
 
 
-# User Database Route
-# this route sends back list of users
 @app.route("/users", methods=["GET"])
-@login
+@admin_login
 def get_all_users(is_login):
+
     if not is_login:
         return make_response("Unauthorized", 401)
 
     # querying the database
     # for all the entries in it
     users = User.query.all()
+
     # converting the query objects
     # to list of jsons
     output = []
+
     for user in users:
         # appending the user data json
-        # to the response list
+        # to the response list by encrypted email
         output.append(
             {
                 "public_id": user.public_id,
@@ -31,4 +33,4 @@ def get_all_users(is_login):
             }
         )
 
-    return jsonify({"users": output})
+    return {"users": output}
