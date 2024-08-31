@@ -1,29 +1,22 @@
+# Basic Packages
+import os
 import sys
 
-sys.path.append(".")
-
-import os
+# App Packages
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 
-basedir = os.path.abspath(os.path.dirname(__file__))
 
-directory = "instance"
-db_base = os.path.join(basedir, directory)
-
-if not os.path.exists(db_base):
-    os.mkdir(db_base)
-
-db_name = "Database.db"
-db_path = os.path.join(db_base, db_name)
+# Database Setup
+db_path = os.getenv("DB_URI")
+db_path_parent = os.path.dirname(db_path)
+os.makedirs(db_path_parent, exist_ok=True)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 
-# creates SQLALCHEMY object
 db = SQLAlchemy(app)
 
-# Migrate User
 public_id_len = 50
 name_len = 100
 email_len = 70
