@@ -65,9 +65,16 @@ const char *get_json_value(json_object *json, char *key) {
 
   const char *value_str = json_object_to_json_string(value);
 
-  int n = strlen(value_str) - 2;
-  char *value_str_trim = (char *)calloc(n + 1, sizeof(char));
-  strncpy(value_str_trim, value_str + 1, n);
+  char *value_str_trim;
+  if (value_str[0] == '"') {
+    int n = strlen(value_str) - 2;
+    value_str_trim = (char *)calloc(n + 1, sizeof(char));
+    strncpy(value_str_trim, value_str + 1, n);
+  } else {
+    int n = strlen(value_str);
+    value_str_trim = (char *)calloc(n + 1, sizeof(char));
+    strncpy(value_str_trim, value_str, n);
+  }
 
   return value_str_trim;
 }

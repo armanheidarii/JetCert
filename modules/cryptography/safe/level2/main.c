@@ -10,6 +10,8 @@ const char *get_json_value(json_object *json, char *key);
 int mod(int a, int b);
 int ismisc1(char c);
 int ismisc2(char c);
+int ismisc3(char c);
+int ismisc4(char c);
 char *encrypt(const char *msg, int shift);
 char *decrypt(char *msg, int shift);
 
@@ -71,9 +73,16 @@ const char *get_json_value(json_object *json, char *key) {
 
   const char *value_str = json_object_to_json_string(value);
 
-  int n = strlen(value_str) - 2;
-  char *value_str_trim = (char *)calloc(n + 1, sizeof(char));
-  strncpy(value_str_trim, value_str + 1, n);
+  char *value_str_trim;
+  if (value_str[0] == '"') {
+    int n = strlen(value_str) - 2;
+    value_str_trim = (char *)calloc(n + 1, sizeof(char));
+    strncpy(value_str_trim, value_str + 1, n);
+  } else {
+    int n = strlen(value_str);
+    value_str_trim = (char *)calloc(n + 1, sizeof(char));
+    strncpy(value_str_trim, value_str, n);
+  }
 
   return value_str_trim;
 }
@@ -100,6 +109,26 @@ int ismisc2(char c) {
   return 0;
 }
 
+int ismisc3(char c) {
+  char *misc3 = "[\\]^_`";
+  for (int i = 0; i < strlen(misc3); i++) {
+    if (misc3[i] == c)
+      return 1;
+  }
+
+  return 0;
+}
+
+int ismisc4(char c) {
+  char *misc4 = "{|}~";
+  for (int i = 0; i < strlen(misc4); i++) {
+    if (misc4[i] == c)
+      return 1;
+  }
+
+  return 0;
+}
+
 char *encrypt(const char *msg, int shift) {
   int size = strlen(msg);
   char *cipher = (char *)calloc(size + 1, sizeof(char));
@@ -115,6 +144,14 @@ char *encrypt(const char *msg, int shift) {
     // Encrypt Second Group of Misc Letters
     else if (ismisc2(msg[i]))
       cipher[i] = (char)((int)(msg[i] + shift - 58) % 7 + 58);
+
+    // Encrypt Third Group of Misc Letters
+    else if (ismisc3(msg[i]))
+      cipher[i] = (char)((int)(msg[i] + shift - 91) % 6 + 91);
+
+    // Encrypt Fourth Group of Misc Letters
+    else if (ismisc4(msg[i]))
+      cipher[i] = (char)((int)(msg[i] + shift - 123) % 4 + 123);
 
     // Encrypt Digit Letters
     else if (isdigit(msg[i]))
@@ -148,6 +185,14 @@ char *decrypt(char *cipher, int shift) {
     // Encrypt Second Group of Misc Letters
     else if (ismisc2(cipher[i]))
       msg[i] = (char)(mod((int)(cipher[i] - shift - 58), 7) + 58);
+
+    // Encrypt Third Group of Misc Letters
+    else if (ismisc3(cipher[i]))
+      msg[i] = (char)(mod((int)(cipher[i] - shift - 91), 6) + 91);
+
+    // Encrypt Fourth Group of Misc Letters
+    else if (ismisc4(cipher[i]))
+      msg[i] = (char)(mod((int)(cipher[i] - shift - 123), 4) + 123);
 
     // Encrypt Digit Letters
     else if (isdigit(cipher[i]))
