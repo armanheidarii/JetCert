@@ -1,32 +1,59 @@
+# Basic Packages
+import os
 from functools import wraps
+from datetime import datetime, timedelta
 
 # Database ORMs
 from db import db, User, email_len, password_len
 
+# App Packages
 import json
-from datetime import datetime, timedelta
 import jwt
 from flask import request, jsonify, make_response
 from app import app, Login
 
 
 # decorator for verifying the user
-def login(f):
+def user_login(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+
         # creates dictionary of form auth data
-        auth = request.form
+        auth = request.authorization
 
-        # returns 400 if any email or / and password is missing
-        if not auth or not auth.get("email") or not auth.get("password"):
-            return make_response("Email or password is missing!", 400)
+        # returns 400 if necessary data is missing
+        if not auth:
+            return make_response("Auth data is missing!", 400)
 
-        email = auth.get("email")
-        password = auth.get("password")
+        response = Login.run(inputs={"email": auth.username, "password": auth.password})
 
-        response = Login.run(inputs={"email": email, "password": password})
+        is_user_login = response.get("result").get("login")
 
-        is_login = response.get("result").get("login")
-        return f(is_login, *args, **kwargs)
+        return f(is_user_login, *args, **kwargs)
+
+    return decorated
+
+
+# decorator for verifying the admin
+def admin_login(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+
+        # creates dictionary of form auth data
+        headers = request.headers
+
+        # returns 400 if necessary data is missing
+        if not headers:
+            return make_response("Headers are missing!", 400)
+
+        admin_secret = headers.get("admin_secret")
+
+        # returns 400 if admin secret is missing
+        if not admin_secret:
+            return make_response("Admin secret is missing!", 400)
+
+        is_admin_login = admin_secret == os.getenv("ADMIN_SECRET")
+
+        return f(is_admin_login, *args, **kwargs)
 
     return decorated
