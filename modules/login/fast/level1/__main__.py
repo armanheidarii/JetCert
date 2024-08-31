@@ -1,9 +1,7 @@
-import sys
-
-sys.path.append(".")
-
+import os
 import json
 import sqlite3
+
 
 email_len = 70
 password_len = 80
@@ -32,7 +30,7 @@ if len(password) > password_len:
     eprint("Your email is invalid!")
     exit(0)
 
-db_path = "/home/arman/develop/compiler-artifact/jetCert/db/instance/Database.db"
+db_path = os.getenv("DB_URI")
 connection = sqlite3.connect(db_path)
 cur = connection.cursor()
 
