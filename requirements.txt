@@ -1,8 +1,0 @@
-datetime
-functools
-uuid
-jwt
-Flask-RESTful
-PyJWT
-Flask-SQLAlchemy
-sqlite3

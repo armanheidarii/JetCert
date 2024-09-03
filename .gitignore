@@ -1,7 +1,12 @@
+# Local Files
 improve.txt
 document.txt
-__pycache__
-instance
-main
+
+# Compile Files
+main[^/]
 __main__
+__pycache__
+
+# App Files
 .env
+**/db/instance/

@@ -34,3 +34,7 @@ print(f"\nFinal Login Res\n{login_response}")
 
 crypto_response = Crypto.run(inputs={"plaintext": "armanheids@gmail.com"})
 print(f"\nFinal Crypto Res\n{crypto_response}")
+
+# valid function calls:
+# JetCert: create, add_module, get_module, get_all_modules, run_module, remove_module
+# Module: is_ready, run

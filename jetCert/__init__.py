@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 import traceback
 import time
@@ -330,7 +331,7 @@ class Module:
 
     def get_numba_files_path(self):
         return {
-            name: file_path.replace("/", ".")
+            name: file_path[file_path.rfind(self.module_name) :].replace("/", ".")
             for name, file_path in self.get_state_files_path("fast").items()
         }
 
@@ -354,6 +355,8 @@ class JetCert:
         try:
             if period <= 0:
                 return None
+
+            sys.path.append(modules_path)
 
             return JetCert(modules_path=modules_path, period=period)
 
