@@ -9,4 +9,4 @@ __pycache__
 
 # App Files
 .env
-**/db/instance/
+**/db/data/
