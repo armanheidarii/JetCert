@@ -17,9 +17,9 @@ int name_len = 100;
 int email_len = 70;
 int password_len = 80;
 
-char db_path[] =
-    "/home/arman/develop/compiler-artifact/jetCert/self-adaptive-system/main/db/instance/"
-    "Database.db";
+char db_path[] = "/home/arman/develop/compiler-artifact/jetCert/"
+                 "self-adaptive-system/main/db/data/"
+                 "Database.db";
 
 struct User *user;
 
