@@ -16,7 +16,9 @@ from requests.auth import HTTPBasicAuth
 class TestJetCert(unittest.TestCase):
 
     def setUp(self):
-        self.base_url = "http://localhost:5000"
+        host = os.getenv("HOST")
+        port = os.getenv("PORT")
+        self.base_url = f"http://{host}:{port}"
 
     def test_1_signup(self):
         url = self.base_url + "/signup"
