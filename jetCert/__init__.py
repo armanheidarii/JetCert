@@ -179,6 +179,7 @@ class Module:
         self.is_active_flag = True
         self.safety = {"state": "safe", "level": 1}
         self.numba_cache_functions = {}
+        self.request_number = 0
         self.builder = Builder.create(self)
 
     def create(
@@ -242,14 +243,26 @@ class Module:
             return None
 
     def get_status(self):
-        return (
-            ("active" if self.is_active_flag else "inactive")
-            if self.is_ready_flag
-            else "pending"
-        )
+        try:
+            return (
+                ("active" if self.is_active_flag else "inactive")
+                if self.is_ready_flag
+                else "pending"
+            )
+        except:
+            traceback.print_exc()
+            return None
 
     def get_safety(self):
         return self.safety.copy()
+
+    def get_request_number(self):
+        try:
+            return self.request_number
+
+        except:
+            traceback.print_exc()
+            return None
 
     def run(self, inputs=None):
         try:
@@ -282,6 +295,8 @@ class Module:
                 response = Builder.run_exe_file(file_path, inputs=inputs).copy()
 
             response["safety"] = safety
+
+            self.request_number += 1
 
             return response
 
