@@ -34,7 +34,7 @@ db_path = os.getenv("DB_URI")
 connection = sqlite3.connect(db_path)
 cur = connection.cursor()
 
-user = cur.execute("SELECT * from USER WHERE Email = ?", [email]).fetchone()
+user = cur.execute("SELECT * from User WHERE Email = ?", [email]).fetchone()
 
 if not user:
     print(json.dumps({"login": False}))

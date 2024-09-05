@@ -1,13 +1,18 @@
 import os
 import sys
+from dotenv import load_dotenv
 
 sys.path.append(".")
 # change: use from pip
 from jetCert import JetCert
 
+load_dotenv()
+
 jet_cert = JetCert.create(
     period=2,
     modules_path=os.getenv("MODULES_PATH"),
+    capture_MAPE_data=True,
+    MAPE_data_path=os.getenv("MAPE_DATA_PATH"),
 )
 
 Login = jet_cert.add_module(
@@ -39,3 +44,6 @@ Physics = jet_cert.add_module(
 )
 
 jet_cert.start()
+
+print(jet_cert.get_MAPE_data(limit=10, offset=2, wait_to_ready=True))
+# print(JetCert.get_MAPE_data(os.getenv("MAPE_DATA_PATH")))

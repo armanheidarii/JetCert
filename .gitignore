@@ -3,10 +3,11 @@ improve.txt
 document.txt
 
 # Compile Files
-main[^/]
+main
 __main__
 __pycache__
 
 # App Files
 .env
 **/db/data/
+**/experiments/data/

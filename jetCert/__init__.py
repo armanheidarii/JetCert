@@ -5,6 +5,7 @@ import traceback
 import time
 import threading
 import json
+import sqlite3
 
 
 class Builder:
@@ -56,6 +57,11 @@ class Builder:
         except:
             traceback.print_exc()
             return None
+
+    def create_db(path):
+        os.makedirs(path, exist_ok=True)
+        path = os.path.join(path, "Database.db")
+        return sqlite3.connect(path, check_same_thread=False)
 
     def compile_numba_versions(self):
         files_path = self.module.get_numba_files_path()
@@ -179,7 +185,7 @@ class Module:
         self.is_active_flag = True
         self.safety = {"state": "safe", "level": 1}
         self.numba_cache_functions = {}
-        self.request_number = 0
+        self.requests_number = 0
         self.builder = Builder.create(self)
 
     def create(
@@ -256,9 +262,9 @@ class Module:
     def get_safety(self):
         return self.safety.copy()
 
-    def get_request_number(self):
+    def get_requests_number(self):
         try:
-            return self.request_number
+            return self.requests_number
 
         except:
             traceback.print_exc()
@@ -296,7 +302,7 @@ class Module:
 
             response["safety"] = safety
 
-            self.request_number += 1
+            self.requests_number += 1
 
             return response
 
@@ -325,15 +331,18 @@ class Module:
 
     def get_file_path(self, safety_state, safety_level):
         level_path = self.get_level_path(safety_state, safety_level)
+
         entry_file_name = (
             self.fast_entry_file_name
             if safety_state == "fast"
             else self.safe_entry_file_name
         )
+
         return f"{level_path}/{entry_file_name}"
 
     def get_state_files_path(self, safety_state):
         state_path = self.get_state_path(safety_state)
+
         state_levels_path = {}
         for name in os.listdir(state_path):
             if name.startswith("level"):
@@ -343,6 +352,10 @@ class Module:
                 state_levels_path[name] = file_path
 
         return state_levels_path
+
+    def get_numba_file_path(self):
+        file_path = self.get_file_path(safety_state, safety_level)
+        return file_path[file_path.rfind(self.module_name) :].replace("/", ".")
 
     def get_numba_files_path(self):
         return {
@@ -359,21 +372,42 @@ class Module:
 
 
 class JetCert:
-    def __init__(self, modules_path=".", period=60):
+    def __init__(
+        self,
+        period=60,
+        modules_path=".",
+        capture_MAPE_data=False,
+        MAPE_data_path=".",
+    ):
+        self.MAPE = MAPE.create(
+            self,
+            period=period,
+            capture_MAPE_data=capture_MAPE_data,
+            MAPE_data_path=MAPE_data_path,
+        )
         self.modules_path = modules_path
-        self.MAPE = MAPE.create(self, period)
         self.modules = dict()
         self.pending_modules = list()
         self.lock = threading.Lock()
 
-    def create(modules_path=".", period=60):
+    def create(
+        period=60,
+        modules_path=".",
+        capture_MAPE_data=False,
+        MAPE_data_path=".",
+    ):
         try:
             if period <= 0:
                 return None
 
             sys.path.append(modules_path)
 
-            return JetCert(modules_path=modules_path, period=period)
+            return JetCert(
+                period=period,
+                modules_path=modules_path,
+                capture_MAPE_data=capture_MAPE_data,
+                MAPE_data_path=MAPE_data_path,
+            )
 
         except:
             traceback.print_exc()
@@ -489,88 +523,152 @@ class JetCert:
             traceback.print_exc()
             return None
 
+    def get_MAPE_data(self, limit=-1, offset=0, wait_to_ready=False):
+        try:
+            return self.MAPE.get_MAPE_data(
+                limit=limit,
+                offset=offset,
+                wait_to_ready=wait_to_ready,
+            )
+
+        except:
+            traceback.print_exc()
+            return None
+
+    def get_MAPE_data_path(self):
+        try:
+            return self.MAPE.get_MAPE_data_path()
+
+        except:
+            traceback.print_exc()
+            return None
+
     def get_modules_path(self):
-        return self.modules_path
+        try:
+            return self.modules_path
+
+        except:
+            traceback.print_exc()
+            return None
 
 
 class MAPE:
-    def __init__(self, system, period=60):
+    def __init__(self, system, period=60, capture_MAPE_data=False, MAPE_data_path="."):
         self.system = system
         self.period = period
-        self.MAPE_thread = threading.Thread(target=self.MAPE)
+        self.capture_MAPE_data = capture_MAPE_data
+        self.MAPE_data_path = MAPE_data_path
         self.is_start_flag = False
         self.is_stop_flag = False
+        self.itr = 0
 
-    def create(system, period=60):
+    def create(system, period=60, capture_MAPE_data=False, MAPE_data_path="."):
         if period <= 0:
             return None
 
-        return MAPE(system, period=period)
+        return MAPE(
+            system,
+            period=period,
+            capture_MAPE_data=capture_MAPE_data,
+            MAPE_data_path=MAPE_data_path,
+        )
+
+    def create_db(self):
+        self.conn = Builder.create_db(self.MAPE_data_path)
+        self.cursor = self.conn.cursor()
+        self.cursor.execute(
+            """CREATE TABLE IF NOT EXISTS MAPE
+             (Monitor real, Analyse real, Planning real, Execute real, Overall real, Safe_Interval)"""
+        )
+        self.conn.commit()
 
     def start(self):
+        if self.is_capture_MAPE_data():
+            self.create_db()
+
         print(f"start MAPE round 0")
 
-        monitor = self.monitor()
-        analyse = self.analyse(monitor)
-        planning = self.planning(analyse)
-        self.execute(planning)
-
-        self.flush_pending_modules()
+        self.update()
 
         print(f"finish MAPE round 0")
 
-        self.MAPE_thread.start()
+        threading.Thread(target=self.MAPE).start()
         self.is_start_flag = True
 
     def is_start(self):
         return self.is_start_flag
 
     def stop(self):
+        self.conn.close()
         self.is_stop_flag = True
 
     def is_stop(self):
         return self.is_stop_flag
 
+    def is_capture_MAPE_data(self):
+        return self.capture_MAPE_data
+
     def monitor(self):
         try:
+            start = time.time()
+
             monitor_file_path = self.get_mape_file_path("monitor")
             response = Builder.run_python_file(monitor_file_path)
-            return response.get("result")
+
+            end = time.time()
+
+            return response.get("result"), end - start
 
         except:
             traceback.print_exc()
-            return None
+            return None, None
 
     def analyse(self, monitor_data):
         try:
+            start = time.time()
+
             analyse_file_path = self.get_mape_file_path("analyse")
             response = Builder.run_python_file(analyse_file_path, inputs=monitor_data)
-            return response.get("result")
+
+            end = time.time()
+
+            return response.get("result"), end - start
 
         except:
             traceback.print_exc()
-            return None
+            return None, None
 
     def planning(self, analyse_data):
         try:
+            start = time.time()
+
             planning_file_path = self.get_mape_file_path("planning")
             response = Builder.run_python_file(planning_file_path, inputs=analyse_data)
-            return response.get("result")
+
+            end = time.time()
+
+            return response.get("result"), end - start
 
         except:
             traceback.print_exc()
-            return None
+            return None, None
 
     def execute(self, planning_data):
         try:
+            start = time.time()
+
             for module_name, data in planning_data.items():
                 module = self.system.modules.get(module_name)
                 if module != None:
                     module.execute(data)
 
+            end = time.time()
+
+            return end - start
+
         except:
             traceback.print_exc()
-            return None
+            return None, None
 
     def flush_pending_modules(self):
         self.system.lock.acquire()
@@ -582,6 +680,38 @@ class MAPE:
 
         self.system.lock.release()
 
+    def update(self):
+        monitor, monitor_execution_time = self.monitor()
+        analyse, analyse_execution_time = self.analyse(monitor)
+        planning, planning_execution_time = self.planning(analyse)
+        execute_execution_time = self.execute(planning)
+
+        if self.is_capture_MAPE_data():
+
+            overall_execution_time = (
+                monitor_execution_time
+                + analyse_execution_time
+                + planning_execution_time
+                + execute_execution_time
+            )
+            safe_interval = self.period - overall_execution_time
+
+            data = (
+                monitor_execution_time,
+                analyse_execution_time,
+                planning_execution_time,
+                execute_execution_time,
+                overall_execution_time,
+                safe_interval,
+            )
+
+            self.cursor.execute(f"INSERT INTO MAPE VALUES {data}")
+            self.conn.commit()
+
+        self.flush_pending_modules()
+
+        self.itr += 1
+
     def MAPE(self):
         try:
             i = 1
@@ -591,23 +721,33 @@ class MAPE:
 
                 print(f"start MAPE round {i}")
 
-                monitor = self.monitor()
-                analyse = self.analyse(monitor)
-                planning = self.planning(analyse)
-                self.execute(planning)
-
-                self.flush_pending_modules()
+                self.update()
 
                 print(f"finish MAPE round {i}")
                 i += 1
 
         except:
-            self.MAPE_thread = threading.Thread(target=self.MAPE)
-            self.MAPE_thread.start()
+            threading.Thread(target=self.MAPE).start()
 
             traceback.print_exc()
             return None
 
+    def get_MAPE_data(self, limit=-1, offset=0, wait_to_ready=False):
+        if not self.is_start() or not self.is_capture_MAPE_data():
+            return None
+
+        if (limit < 0 and limit != -1) or offset < 0:
+            return None
+
+        while wait_to_ready and self.itr <= limit + offset:
+            pass
+
+        self.cursor.execute("SELECT * FROM MAPE LIMIT ? OFFSET ?", (limit, offset))
+        return self.cursor.fetchall()
+
     def get_mape_file_path(self, file_name):
         modules_path = self.system.get_modules_path()
         return f"{modules_path}/__MAPE__/{file_name}.py"
+
+    def get_MAPE_data_path(self):
+        return self.MAPE_data_path

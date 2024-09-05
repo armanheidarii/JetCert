@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Create SQL statement */
-  sprintf(sql, "SELECT * from USER WHERE email = \"%s\"", email);
+  sprintf(sql, "SELECT * from User WHERE Email = \"%s\"", email);
 
   /* Execute SQL statement */
   rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
