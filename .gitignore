@@ -4,6 +4,7 @@ document.txt
 
 # Compile Files
 main
+!main/
 __main__
 __pycache__
 
