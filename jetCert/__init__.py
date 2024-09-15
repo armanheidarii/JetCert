@@ -747,7 +747,7 @@ class MAPE:
 
     def get_mape_file_path(self, file_name):
         modules_path = self.system.get_modules_path()
-        return f"{modules_path}/__MAPE__/{file_name}.py"
+        return f"{modules_path}/__MAPE__/{file_name}"
 
     def get_MAPE_data_path(self):
         return self.MAPE_data_path
