@@ -1,17 +1,34 @@
 # JetCert
 
+## Contents
+
+- [Requirements](#requirements)
+- [Usage](#usage)
+- [Test](#test)
+- [Experiment](#experiment)
+
 ## Requirements
 ```python
 git clone git@github.com:armanheidarii/JetCert.git
-pip install -r requirements.txt
+pip install -r self-adaptive-system/requirements.txt
 ```
 
 ## Usage
 ```python
-python app
+python self-adaptive-system
 ```
 
-## Quick Example
+## Test
+```python
+python self-adaptive-system/tests
+```
+
+## Experiment
+```python
+python self-adaptive-system/experiments
+```
+
+## JetCert Example
 ```python
 python jetCert/examples/example1.py
 ```
