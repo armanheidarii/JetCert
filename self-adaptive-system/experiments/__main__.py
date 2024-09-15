@@ -45,5 +45,27 @@ Physics = jet_cert.add_module(
 
 jet_cert.start()
 
-print(jet_cert.get_MAPE_data(limit=10, offset=2, wait_to_ready=True))
-# print(JetCert.get_MAPE_data(os.getenv("MAPE_DATA_PATH")))
+MAPE_data = jet_cert.get_MAPE_data(limit=10, offset=2, wait_to_ready=True)
+
+iterations_count = MAPE_data.get("iterations_count")
+monitor_execution_times = MAPE_data.get("monitor_execution_times")
+analyse_execution_times = MAPE_data.get("analyse_execution_times")
+planning_execution_times = MAPE_data.get("planning_execution_times")
+execute_execution_times = MAPE_data.get("execute_execution_times")
+overall_execution_times = MAPE_data.get("overall_execution_times")
+safe_intervals = MAPE_data.get("safe_intervals")
+
+x = list(range(0, iterations_count))
+
+import MAPE_plt
+import interval_plt
+
+MAPE_plt.show(
+    x,
+    monitor_execution_times,
+    analyse_execution_times,
+    planning_execution_times,
+    execute_execution_times,
+)
+
+interval_plt.show(x, overall_execution_times, safe_intervals)

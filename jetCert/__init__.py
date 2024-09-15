@@ -582,9 +582,14 @@ class MAPE:
         )
         self.conn.commit()
 
+    def setup_itr(self):
+        self.cursor.execute("SELECT COUNT(*) FROM MAPE")
+        self.itr = self.cursor.fetchone()[0]
+
     def start(self):
         if self.is_capture_MAPE_data():
             self.create_db()
+            self.setup_itr()
 
         print(f"start MAPE round 0")
 
@@ -743,7 +748,24 @@ class MAPE:
             pass
 
         self.cursor.execute("SELECT * FROM MAPE LIMIT ? OFFSET ?", (limit, offset))
-        return self.cursor.fetchall()
+
+        MAPE_data = self.cursor.fetchall()
+        monitor_execution_times = [row[0] for row in MAPE_data]
+        analyse_execution_times = [row[1] for row in MAPE_data]
+        planning_execution_times = [row[2] for row in MAPE_data]
+        execute_execution_times = [row[3] for row in MAPE_data]
+        overall_execution_times = [row[4] for row in MAPE_data]
+        safe_intervals = [row[5] for row in MAPE_data]
+
+        return {
+            "iterations_count": len(monitor_execution_times),
+            "monitor_execution_times": monitor_execution_times,
+            "analyse_execution_times": analyse_execution_times,
+            "planning_execution_times": planning_execution_times,
+            "execute_execution_times": execute_execution_times,
+            "overall_execution_times": overall_execution_times,
+            "safe_intervals": safe_intervals,
+        }
 
     def get_mape_file_path(self, file_name):
         modules_path = self.system.get_modules_path()
