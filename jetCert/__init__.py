@@ -1,11 +1,14 @@
 import os
 import sys
+import threading
 import subprocess
 import traceback
 import time
-import threading
 import json
+import queue
 import sqlite3
+from flask import Flask, request, Response
+from http import HTTPStatus
 
 
 class Builder:
@@ -58,6 +61,14 @@ class Builder:
             traceback.print_exc()
             return None
 
+    def extract_relative_paths(file_paths, base_path):
+        relative_paths = []
+        for file_path in file_paths:
+            if base_path in file_path:
+                relative_path = os.path.relpath(file_path, base_path)
+                relative_paths.append(relative_path)
+        return relative_paths
+
     def create_db(path):
         os.makedirs(path, exist_ok=True)
         path = os.path.join(path, "Database.db")
@@ -101,13 +112,25 @@ class Builder:
 
             print(response)
 
-    def run_cmd(cmd, inputs=None):
+    def run_cmd(cmd, dest_path=".", inputs=None):
+        original_path = os.getcwd()
+        try:
+            os.chdir(dest_path)
+        except:
+            # None nade va json bede
+            return None
+
         if inputs != None:
             inputs = json.dumps(inputs) if Builder.is_json(inputs) else f"{inputs}"
 
         completed_process = subprocess.run(
-            cmd, input=inputs, capture_output=True, text=True
+            cmd,
+            input=inputs,
+            capture_output=True,
+            text=True,
         )
+
+        os.chdir(original_path)
 
         return {
             "returncode": completed_process.returncode,
@@ -161,6 +184,24 @@ class Builder:
             "process": response,
             "result": (json.loads(stdout) if Builder.is_json(stdout) else stdout),
         }
+
+    def git_pull(path=".", remote_name="origin", branch="main"):
+        cmd = ["git", "pull", remote_name, branch]
+        response = Builder.run_cmd(cmd, dest_path=path)
+        return response.get("returncode") == 0
+
+    def get_git_head_hash(path="."):
+        cmd = ["git", "rev-parse", "HEAD"]
+        response = Builder.run_cmd(cmd, dest_path=path)
+        if response.get("returncode") != 0:
+            return None
+
+        return response.get("stdout").strip()
+
+    def get_git_file_changes(git_head_hash, path="."):
+        cmd = f"""GIT_PAGER=cat && git log --pretty=format:"%H" --no-patch | while read -r itr; do if [ "$itr" != "{git_head_hash}" ]; then git diff --name-only $itr; else break; fi; done | sort |  uniq"""
+        response = Builder.run_cmd(cmd, dest_path=path)
+        return response.get("stdout")
 
 
 class Module:
@@ -378,16 +419,25 @@ class JetCert:
         modules_path=".",
         capture_MAPE_data=False,
         MAPE_data_path=".",
+        github_webhook_port=8085,
+        github_webhook_path="/update",
+        github_webhook_secret="",
     ):
+        self.modules_path = modules_path
+        self.modules = dict()
+        self.pending_modules_name = list()
         self.MAPE = MAPE.create(
             self,
             period=period,
             capture_MAPE_data=capture_MAPE_data,
             MAPE_data_path=MAPE_data_path,
         )
-        self.modules_path = modules_path
-        self.modules = dict()
-        self.pending_modules = list()
+        self.CI = CI.create(
+            self,
+            github_webhook_port=github_webhook_port,
+            github_webhook_path=github_webhook_path,
+            github_webhook_secret=github_webhook_secret,
+        )
         self.lock = threading.Lock()
 
     def create(
@@ -395,20 +445,33 @@ class JetCert:
         modules_path=".",
         capture_MAPE_data=False,
         MAPE_data_path=".",
+        github_webhook_port=8085,
+        github_webhook_path="/update",
+        github_webhook_secret="",
     ):
         try:
             if period <= 0:
                 return None
 
+            modules_path = os.path.abspath(modules_path)
             sys.path.append(modules_path)
 
-            return JetCert(
+            jetCert = JetCert(
                 period=period,
                 modules_path=modules_path,
                 capture_MAPE_data=capture_MAPE_data,
                 MAPE_data_path=MAPE_data_path,
+                github_webhook_port=github_webhook_port,
+                github_webhook_path=github_webhook_path,
+                github_webhook_secret=github_webhook_secret,
             )
 
+            is_webhook_set = jetCert.CI.set_webhook()
+
+            if not is_webhook_set:
+                return None
+
+            return jetCert
         except:
             traceback.print_exc()
             return None
@@ -478,7 +541,7 @@ class JetCert:
             )
 
             self.modules[module_name] = module
-            self.pending_modules.append(module_name)
+            self.pending_modules_name.append(module_name)
 
             self.lock.release()
 
@@ -560,6 +623,8 @@ class MAPE:
         self.MAPE_data_path = MAPE_data_path
         self.is_start_flag = False
         self.is_stop_flag = False
+        self.conn = None
+        self.cursor = None
         self.itr = 0
 
     def create(system, period=60, capture_MAPE_data=False, MAPE_data_path="."):
@@ -573,12 +638,17 @@ class MAPE:
             MAPE_data_path=MAPE_data_path,
         )
 
-    def create_db(self):
+    def create_MAPE_db(self):
         self.conn = Builder.create_db(self.MAPE_data_path)
         self.cursor = self.conn.cursor()
         self.cursor.execute(
-            """CREATE TABLE IF NOT EXISTS MAPE
-             (Monitor real, Analyse real, Planning real, Execute real, Overall real, Safe_Interval)"""
+            """CREATE TABLE IF NOT EXISTS MAPE (
+                Monitor real, 
+                Analyse real, 
+                Planning real, 
+                Execute real, 
+                Overall real, 
+                Safe_Interval real)"""
         )
         self.conn.commit()
 
@@ -588,7 +658,7 @@ class MAPE:
 
     def start(self):
         if self.is_capture_MAPE_data():
-            self.create_db()
+            self.create_MAPE_db()
             self.setup_itr()
 
         print(f"start MAPE round 0")
@@ -619,7 +689,7 @@ class MAPE:
 
             monitor_file_path = self.get_mape_file_path("monitor")
             response = Builder.run_python_file(monitor_file_path)
-
+            print(response)
             end = time.time()
 
             return response.get("result"), end - start
@@ -675,17 +745,24 @@ class MAPE:
             traceback.print_exc()
             return None, None
 
-    def flush_pending_modules(self):
-        self.system.lock.acquire()
+    def active_pending_modules(self):
+        for pend_module_name in self.system.pending_modules_name:
+            self.system.modules.get(pend_module_name).is_ready_flag = True
 
-        for pend_module in self.system.pending_modules:
-            self.system.modules.get(pend_module).is_ready_flag = True
+            if self.is_capture_MAPE_data():
+                self.cursor.execute(
+                    f"""CREATE TABLE IF NOT EXISTS {pend_module_name} (
+                        Status TEXT, 
+                        State TEXT, 
+                        Level INTEGER)"""
+                )
+                self.conn.commit()
 
-        self.system.pending_modules = list()
-
-        self.system.lock.release()
+        self.system.pending_modules_name = list()
 
     def update(self):
+        self.system.lock.acquire()
+
         monitor, monitor_execution_time = self.monitor()
         analyse, analyse_execution_time = self.analyse(monitor)
         planning, planning_execution_time = self.planning(analyse)
@@ -713,23 +790,36 @@ class MAPE:
             self.cursor.execute(f"INSERT INTO MAPE VALUES {data}")
             self.conn.commit()
 
-        self.flush_pending_modules()
+        self.active_pending_modules()
 
         self.itr += 1
 
+        self.system.lock.release()
+
+    def CI_queue_updating(self):
+        queue = self.system.CI.queue
+
+        start_time = time.time()
+        while time.time() - start_time < self.period:
+            if not queue.empty():
+                element = queue.get()
+                module_name = element.get("module_name")
+                module = self.system.modules[module_name]
+                safety = element.get("safety")
+                level = element.get("level")
+                print(element)
+
     def MAPE(self):
         try:
-            i = 1
             while not self.is_stop_flag:
 
-                time.sleep(self.period)
+                self.CI_queue_updating()
 
-                print(f"start MAPE round {i}")
+                print(f"start MAPE round {self.itr}")
 
                 self.update()
 
-                print(f"finish MAPE round {i}")
-                i += 1
+                print(f"finish MAPE round {self.itr}")
 
         except:
             threading.Thread(target=self.MAPE).start()
@@ -773,3 +863,112 @@ class MAPE:
 
     def get_MAPE_data_path(self):
         return self.MAPE_data_path
+
+
+class CI:
+    def __init__(
+        self,
+        system,
+        github_webhook_port=8085,
+        github_webhook_path="/update",
+        github_webhook_secret="",
+    ):
+        self.system = system
+        self.queue = queue.Queue()
+        self.app = Flask(__name__)
+        self.github_webhook_port = github_webhook_port
+        self.github_webhook_path = github_webhook_path
+        self.github_webhook_secret = github_webhook_secret
+        self.git_head_hash = None
+
+    def create(
+        system,
+        github_webhook_port=8085,
+        github_webhook_path="/update",
+        github_webhook_secret="",
+    ):
+        return CI(
+            system,
+            github_webhook_port=github_webhook_port,
+            github_webhook_path=github_webhook_path,
+            github_webhook_secret=github_webhook_secret,
+        )
+
+    def create_queue_elements(relative_changed_files):
+        queue_elements = []
+        for relative_changed_file in relative_changed_files:
+            parts = relative_changed_file.split("/")
+
+            queue_elements.append(
+                {
+                    "module_name": parts[0],
+                    "safety": parts[1],
+                    "level": parts[2],
+                }
+            )
+
+        return queue_elements
+
+    def put_queue_elements(self, queue_elements):
+        for queue_element in queue_elements:
+            self.queue.put(queue_element)
+
+    def verify_signature(self, payload, signature):
+        computed_signature = (
+            "sha256="
+            + hmac.new(
+                self.github_webhook_secret.encode(),
+                payload,
+                hashlib.sha256,
+            ).hexdigest()
+        )
+        return hmac.compare_digest(computed_signature, signature)
+
+    def webhook_handler(self):
+        signature = request.headers.get("X-Hub-Signature-256")
+        if not signature:
+            Response("Missing signature", status=HTTPStatus.BadRequest)
+
+        if not self.verify_signature(request.data, signature):
+            Response("Invalid signature", status=HTTPStatus.FORBIDDEN)
+
+        event = request.headers.get("X-GitHub-Event")
+        print(f"Received event: {event}")
+
+        if event == "push":
+            print("Push event received")
+        elif event == "pull_request":
+            print("Pull request event received")
+
+        is_git_pull = Builder.git_pull(self.system.get_modules_path())
+        if is_git_pull:
+            return Response("Can not updated", status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+        changed_files = Builder.get_git_file_changes(self.git_head_hash)
+
+        relative_changed_files = Builder.extract_relative_paths(changed_files)
+        queue_elements = CI.create_queue_elements(relative_changed_files)
+        self.put_queue_elements(queue_elements)
+
+        modules_path = self.system.get_modules_path()
+        self.git_head_hash = Builder.get_git_head_hash(modules_path)
+
+        return Response("Updated", status=HTTPStatus.OK)
+
+    def set_webhook(self):
+        @self.app.route(self.github_webhook_path, methods=["POST"])
+        def webhook():
+            return self.webhook_handler()
+
+        run_thread = threading.Thread(
+            target=self.app.run,
+            kwargs={"host": "0.0.0.0", "port": self.github_webhook_port},
+        )
+        run_thread.start()
+
+        time.sleep(1)
+
+        if not run_thread.is_alive():
+            return False
+
+        return True
