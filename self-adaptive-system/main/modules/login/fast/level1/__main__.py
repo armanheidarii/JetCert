@@ -2,8 +2,6 @@ import os
 import json
 import sqlite3
 
-# test
-
 
 email_len = 70
 password_len = 80
