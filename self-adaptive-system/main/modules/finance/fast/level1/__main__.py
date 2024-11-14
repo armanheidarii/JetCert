@@ -1,6 +1,9 @@
 import numpy as np
 
 
+
+
+
 def cnd(d):
     A1 = 0.31938153
     A2 = -0.356563782
