@@ -12,6 +12,7 @@ from http import HTTPStatus
 
 
 class Builder:
+    safe_compilation_tools = ["compCert"]
     fast_compilation_tools = ["numba", "codon", "python"]
 
     def __init__(self, module):
@@ -61,36 +62,52 @@ class Builder:
             traceback.print_exc()
             return None
 
-    def extract_relative_paths(file_paths, base_path):
-        relative_paths = []
-        for file_path in file_paths:
-            if base_path in file_path:
-                relative_path = os.path.relpath(file_path, base_path)
-                relative_paths.append(relative_path)
-        return relative_paths
-
     def create_db(path):
         os.makedirs(path, exist_ok=True)
         path = os.path.join(path, "Database.db")
         return sqlite3.connect(path, check_same_thread=False)
 
+    def compile_numba_version(self, safety_level):
+        file_path = self.module.get_file_path("fast", safety_level)
+        numba_entry_function = Builder.compile_numba_file(file_path)
+        self.module.numba_cache_functions[name] = numba_entry_function
+        return numba_entry_function
+
     def compile_numba_versions(self):
         files_path = self.module.get_numba_files_path()
-        for name, file_path in files_path.items():
-            numba_entry_module = Builder.importer(file_path)
-            numba_entry_function = getattr(
-                numba_entry_module, self.module.fast_numba_entry_func_name
-            )
 
+        responses = []
+        for name, file_path in files_path.items():
+            numba_entry_function = Builder.compile_numba_file(
+                file_path,
+                self.module.fast_numba_entry_func_name,
+            )
             self.module.numba_cache_functions[name] = numba_entry_function
+            responses.append(numba_entry_function)
+            print(numba_entry_function)
+
+        return responses
+
+    def compile_codon_version(self, safety_level):
+        file_path = self.module.get_file_path("fast", safety_level)
+        response = Builder.compile_codon_file(file_path)
+        return response
 
     def compile_codon_versions(self):
         files_path = self.module.get_state_files_path("fast")
-        for file_path in files_path:
-            base_cmd = ["codon", "build", "-release", "-exe", f"{file_path}.py"]
-            response = Builder.run_cmd(base_cmd)
 
-            print(response)
+        responses = []
+        for file_path in files_path:
+            response = Builder.compile_codon_file(file_path)
+            responses.append(response)
+
+        return responses
+
+    def compile_fast_version(self, safety_level):
+        if self.module.fast_compilation_tool == "numba":
+            self.compile_numba_version(safety_level)
+        elif self.module.fast_compilation_tool == "codon":
+            self.compile_codon_version(safety_level)
 
     def compile_fast_versions(self):
         if self.module.fast_compilation_tool == "numba":
@@ -98,24 +115,39 @@ class Builder:
         elif self.module.fast_compilation_tool == "codon":
             self.compile_codon_versions()
 
-    def compile_safe_versions(self):
+    def compile_compCert_version(self, safety_level):
+        file_path = self.module.get_file_path("safe", safety_level)
+        return Builder.compile_compCert_file(
+            file_path,
+            linked_files=self.module.safe_linked_files,
+        )
+
+    def compile_compCert_versions(self):
         files_path = self.module.get_state_files_path("safe")
+
+        responses = []
         for name, file_path in files_path.items():
-
-            base_cmd = ["gcc", f"{file_path}.c"]
-            linked_cmd = [
-                f"-l{linked_file}" for linked_file in self.module.safe_linked_files
-            ]
-            output_cmd = ["-o", file_path]
-            cmd = base_cmd + linked_cmd + output_cmd
-            response = Builder.run_cmd(cmd)
-
+            response = Builder.compile_compCert_file(
+                file_path,
+                linked_files=self.module.safe_linked_files,
+            )
+            responses.append(response)
             print(response)
 
-    def run_cmd(cmd, dest_path=".", inputs=None):
+        return responses
+
+    def compile_safe_version(self, safety_level):
+        if self.module.safe_compilation_tool == "compCert":
+            self.compile_compCert_version(safety_level)
+
+    def compile_safe_versions(self):
+        if self.module.safe_compilation_tool == "compCert":
+            self.compile_compCert_versions()
+
+    def run_cmd(cmd, path=".", inputs=None):
         original_path = os.getcwd()
         try:
-            os.chdir(dest_path)
+            os.chdir(path)
         except:
             # None nade va json bede
             return None
@@ -126,6 +158,7 @@ class Builder:
         completed_process = subprocess.run(
             cmd,
             input=inputs,
+            shell=True,
             capture_output=True,
             text=True,
         )
@@ -139,8 +172,34 @@ class Builder:
             "args": " ".join(completed_process.args),
         }
 
+    def compile_compCert_file(file_path, linked_files=[]):
+        # ccomp
+        base_cmd = f"""gcc {file_path}.c"""
+        linked_cmd = " ".join([f"-l{linked_file}" for linked_file in linked_files])
+        output_cmd = f"""-o {file_path}"""
+        cmd = f"""{base_cmd} {linked_cmd} {output_cmd}"""
+        return Builder.run_cmd(cmd)
+
+    def compile_codon_file(file_path):
+        base_cmd = f"""codon build -release -exe {file_path}.py"""
+        return Builder.run_cmd(base_cmd)
+
+    def compile_numba_file(file_path, fast_numba_entry_func_name):
+        try:
+            numba_entry_module = Builder.importer(file_path)
+            numba_entry_function = getattr(
+                numba_entry_module,
+                fast_numba_entry_func_name,
+            )
+
+            return numba_entry_function
+
+        except:
+            return None
+
     def run_exe_file(file_path, inputs=None):
-        response = Builder.run_cmd([file_path], inputs=inputs)
+        cmd = f"""{file_path}"""
+        response = Builder.run_cmd(cmd, inputs=inputs)
 
         stdout = response.get("stdout")
         return {
@@ -149,7 +208,8 @@ class Builder:
         }
 
     def run_python_file(file_path, inputs=None):
-        response = Builder.run_cmd(["python", file_path], inputs=inputs)
+        cmd = f"""python {file_path}"""
+        response = Builder.run_cmd(cmd, inputs=inputs)
 
         stdout = response.get("stdout")
         return {
@@ -186,22 +246,22 @@ class Builder:
         }
 
     def git_pull(path=".", remote_name="origin", branch="main"):
-        cmd = ["git", "pull", remote_name, branch]
-        response = Builder.run_cmd(cmd, dest_path=path)
+        cmd = f"""git pull {remote_name} {branch}"""
+        response = Builder.run_cmd(cmd, path=path)
         return response.get("returncode") == 0
 
     def get_git_head_hash(path="."):
-        cmd = ["git", "rev-parse", "HEAD"]
-        response = Builder.run_cmd(cmd, dest_path=path)
+        cmd = """git rev-parse HEAD"""
+        response = Builder.run_cmd(cmd, path=path)
         if response.get("returncode") != 0:
-            return None
+            return ""
 
         return response.get("stdout").strip()
 
-    def get_git_file_changes(git_head_hash, path="."):
-        cmd = f"""GIT_PAGER=cat && git log --pretty=format:"%H" --no-patch | while read -r itr; do if [ "$itr" != "{git_head_hash}" ]; then git diff --name-only $itr; else break; fi; done | sort |  uniq"""
-        response = Builder.run_cmd(cmd, dest_path=path)
-        return response.get("stdout")
+    def get_git_file_changes(prev_git_head_hash, path="."):
+        cmd = f"""git log --name-status --pretty="format:" {prev_git_head_hash}..HEAD | awk '{{print $2}}' | grep -v '^$' | sort | uniq"""
+        response = Builder.run_cmd(cmd, path=path)
+        return response.get("stdout").split()
 
 
 class Module:
@@ -212,6 +272,7 @@ class Module:
         fast_compilation_tool="python",
         fast_entry_file_name="__main__",
         fast_numba_entry_func_name="go_fast",
+        safe_compilation_tool="compCert",
         safe_entry_file_name="main",
         safe_linked_files=[],
     ):
@@ -220,6 +281,7 @@ class Module:
         self.fast_compilation_tool = fast_compilation_tool
         self.fast_entry_file_name = fast_entry_file_name
         self.fast_numba_entry_func_name = fast_numba_entry_func_name
+        self.safe_compilation_tool = safe_compilation_tool
         self.safe_entry_file_name = safe_entry_file_name
         self.safe_linked_files = safe_linked_files
         self.is_ready_flag = False
@@ -235,6 +297,7 @@ class Module:
         fast_compilation_tool="python",
         fast_entry_file_name="__main__",
         fast_numba_entry_func_name="go_fast",
+        safe_compilation_tool="compCert",
         safe_entry_file_name="main",
         safe_linked_files=[],
     ):
@@ -248,6 +311,7 @@ class Module:
             fast_compilation_tool=fast_compilation_tool,
             fast_entry_file_name=fast_entry_file_name,
             fast_numba_entry_func_name=fast_numba_entry_func_name,
+            safe_compilation_tool=safe_compilation_tool,
             safe_entry_file_name=safe_entry_file_name,
             safe_linked_files=safe_linked_files,
         )
@@ -388,14 +452,14 @@ class Module:
         for name in os.listdir(state_path):
             if name.startswith("level"):
                 file_path = self.get_file_path(
-                    safety_state, int(name[name.rfind("l") + 1 :])
+                    safety_state, int(name.replace("level", ""))
                 )
                 state_levels_path[name] = file_path
 
         return state_levels_path
 
-    def get_numba_file_path(self):
-        file_path = self.get_file_path(safety_state, safety_level)
+    def get_numba_file_path(self, safety_level):
+        file_path = self.get_file_path("fast", safety_level)
         return file_path[file_path.rfind(self.module_name) :].replace("/", ".")
 
     def get_numba_files_path(self):
@@ -454,6 +518,8 @@ class JetCert:
                 return None
 
             modules_path = os.path.abspath(modules_path)
+            MAPE_data_path = os.path.abspath(MAPE_data_path)
+
             sys.path.append(modules_path)
 
             jetCert = JetCert(
@@ -516,6 +582,7 @@ class JetCert:
         fast_compilation_tool="python",
         fast_entry_file_name="__main__",
         fast_numba_entry_func_name="go_fast",
+        safe_compilation_tool="compCert",
         safe_entry_file_name="main",
         safe_linked_files=[],
         wait_to_ready=False,
@@ -536,6 +603,7 @@ class JetCert:
                 fast_compilation_tool=fast_compilation_tool,
                 fast_entry_file_name=fast_entry_file_name,
                 fast_numba_entry_func_name=fast_numba_entry_func_name,
+                safe_compilation_tool=safe_compilation_tool,
                 safe_entry_file_name=safe_entry_file_name,
                 safe_linked_files=safe_linked_files,
             )
@@ -804,10 +872,14 @@ class MAPE:
             if not queue.empty():
                 element = queue.get()
                 module_name = element.get("module_name")
-                module = self.system.modules[module_name]
                 safety = element.get("safety")
                 level = element.get("level")
-                print(element)
+
+                module = self.system.modules[module_name]
+                if safety == "fast":
+                    module.builder.compile_fast_version(level)
+                elif safety == "safe":
+                    module.builder.compile_safe_version(level)
 
     def MAPE(self):
         try:
@@ -879,7 +951,9 @@ class CI:
         self.github_webhook_port = github_webhook_port
         self.github_webhook_path = github_webhook_path
         self.github_webhook_secret = github_webhook_secret
-        self.git_head_hash = None
+        self.git_head_hash = Builder.get_git_head_hash(
+            path=self.system.get_modules_path()
+        )
 
     def create(
         system,
@@ -894,17 +968,28 @@ class CI:
             github_webhook_secret=github_webhook_secret,
         )
 
-    def create_queue_elements(relative_changed_files):
+    def create_queue_elements(self, changed_files):
         queue_elements = []
-        for relative_changed_file in relative_changed_files:
-            parts = relative_changed_file.split("/")
+        for changed_file in changed_files:
+            if "modules" not in changed_file:
+                continue
 
+            modules_path = self.system.get_modules_path()
+            modules_index = changed_file.index("modules") + len("modules")
+            if not modules_path.endswith(changed_file[:modules_index]):
+                continue
+
+            parts = changed_file[modules_index + 1 :].split("/")
+            module_name = parts[0]
+            safety = parts[1]
+            level = int(parts[2].replace("level", ""))
+
+            if not self.system.modules.get(module_name):
+                continue
+
+            # check beshe convention kol framework aya safety va level hast ya na
             queue_elements.append(
-                {
-                    "module_name": parts[0],
-                    "safety": parts[1],
-                    "level": parts[2],
-                }
+                {"module_name": module_name, "safety": safety, "level": level}
             )
 
         return queue_elements
@@ -925,33 +1010,35 @@ class CI:
         return hmac.compare_digest(computed_signature, signature)
 
     def webhook_handler(self):
-        signature = request.headers.get("X-Hub-Signature-256")
-        if not signature:
-            Response("Missing signature", status=HTTPStatus.BadRequest)
+        # signature = request.headers.get("X-Hub-Signature-256")
+        # if not signature:
+        #     Response("Missing signature", status=HTTPStatus.BadRequest)
 
-        if not self.verify_signature(request.data, signature):
-            Response("Invalid signature", status=HTTPStatus.FORBIDDEN)
+        # if not self.verify_signature(request.data, signature):
+        #     Response("Invalid signature", status=HTTPStatus.FORBIDDEN)
 
-        event = request.headers.get("X-GitHub-Event")
-        print(f"Received event: {event}")
+        # event = request.headers.get("X-GitHub-Event")
+        # print(f"Received event: {event}")
 
-        if event == "push":
-            print("Push event received")
-        elif event == "pull_request":
-            print("Pull request event received")
-
-        is_git_pull = Builder.git_pull(self.system.get_modules_path())
-        if is_git_pull:
-            return Response("Can not updated", status=HTTPStatus.INTERNAL_SERVER_ERROR)
-
-        changed_files = Builder.get_git_file_changes(self.git_head_hash)
-
-        relative_changed_files = Builder.extract_relative_paths(changed_files)
-        queue_elements = CI.create_queue_elements(relative_changed_files)
-        self.put_queue_elements(queue_elements)
+        # if event == "push":
+        #     print("Push event received")
+        # elif event == "pull_request":
+        #     print("Pull request event received")
 
         modules_path = self.system.get_modules_path()
-        self.git_head_hash = Builder.get_git_head_hash(modules_path)
+        is_git_pull = Builder.git_pull(path=modules_path)
+        if not is_git_pull:
+            return Response("Can not updated", status=HTTPStatus.INTERNAL_SERVER_ERROR)
+
+        changed_files = Builder.get_git_file_changes(
+            self.git_head_hash,
+            path=modules_path,
+        )
+
+        queue_elements = self.create_queue_elements(changed_files)
+        self.put_queue_elements(queue_elements)
+
+        self.git_head_hash = Builder.get_git_head_hash(path=modules_path)
 
         return Response("Updated", status=HTTPStatus.OK)
 
