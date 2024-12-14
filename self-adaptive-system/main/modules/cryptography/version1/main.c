@@ -16,7 +16,7 @@ int main(int argc, const char *argv[]) {
   char *cipher = encrypt(msg);
 
   json_object *outputs = json_object_new_object();
-  json_object_object_add(outputs, "algorithm", json_object_new_string("same"));
+  json_object_object_add(outputs, "algorithm", json_object_new_string("wire"));
   json_object_object_add(outputs, "ciphertext", json_object_new_string(cipher));
 
   fprintf(stdout, "%s",

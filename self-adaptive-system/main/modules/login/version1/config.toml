@@ -1,0 +1,5 @@
+compilation_mode="fast"
+
+[fast]
+compilation_tool="python"
+entry_file_name="__main__.py"

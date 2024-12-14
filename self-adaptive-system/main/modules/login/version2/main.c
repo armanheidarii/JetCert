@@ -1,4 +1,3 @@
-// #include "../../../../tools/C-Simple-JSON-Parser/json.h"
 #include <json-c/json.h>
 #include <json-c/json_object.h>
 #include <sqlite3.h>
@@ -11,22 +10,16 @@
 
 int query_len = 1024;
 
-int id_len = 50;
-int public_id_len = 50;
-int name_len = 100;
-int email_len = 70;
-int password_len = 80;
+int email_len = 128;
+int password_len = 128;
 
 char db_path[] = "/home/arman/develop/compiler-artifact/jetCert/"
                  "self-adaptive-system/main/db/data/"
-                 "Database.db";
+                 "jetcert.db";
 
-struct User *user;
+struct UserModel *user;
 
-struct User {
-  char *id;
-  char *public_id;
-  char *name;
+struct UserModel {
   char *email;
   char *password;
 };
@@ -72,7 +65,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Create SQL statement */
-  sprintf(sql, "SELECT * from User WHERE Email = \"%s\"", email);
+  sprintf(sql, "SELECT * from UserModel WHERE Email = \"%s\"", email);
 
   /* Execute SQL statement */
   rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
@@ -155,16 +148,7 @@ const char *get_json_value(json_object *json, char *key) {
 
 static int callback(void *data, int argc, char **argv, char **azColName) {
   if (argc > 0) {
-    user = (struct User *)malloc(sizeof(struct User));
-
-    user->id = calloc(id_len + 1, sizeof(char));
-    strcpy(user->id, argv[0]);
-
-    user->public_id = calloc(public_id_len + 1, sizeof(char));
-    strcpy(user->public_id, argv[1]);
-
-    user->name = calloc(name_len + 1, sizeof(char));
-    strcpy(user->name, argv[2]);
+    user = (struct UserModel *)malloc(sizeof(struct UserModel));
 
     user->email = calloc(email_len + 1, sizeof(char));
     strcpy(user->email, argv[3]);

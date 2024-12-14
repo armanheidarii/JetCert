@@ -1,20 +1,15 @@
-# Basic Packages
 import os
-from dotenv import load_dotenv
 import json
+from dotenv import load_dotenv
 import unittest
-
-# Local Packages
-import black_scholes
-import lennard_jones
-
-# App Packages
 import requests
 from requests.auth import HTTPBasicAuth
 
+import finance
+import physics
+
 
 class TestJetCert(unittest.TestCase):
-
     def setUp(self):
         host = os.getenv("HOST")
         port = os.getenv("PORT")
@@ -34,10 +29,10 @@ class TestJetCert(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.text, "Successfully registered.")
 
-    def test_2_black_scholes(self):
+    def test_2_finance(self):
         url = self.base_url + "/black-scholes"
 
-        test = next(black_scholes.input_generator())
+        test = next(finance.input_generator())
         input_args = test.get("input_args")
 
         data = {
@@ -56,10 +51,10 @@ class TestJetCert(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_3_lennard_jones(self):
+    def test_3_physics(self):
         url = self.base_url + "/lennard-jones"
 
-        test = next(lennard_jones.input_generator())
+        test = next(physics.input_generator())
         input_args = test.get("input_args")
 
         data = {
@@ -82,8 +77,6 @@ class TestJetCert(unittest.TestCase):
         }
 
         response = requests.get(url, headers=headers)
-
-        users = json.loads(response.text)
 
         self.assertEqual(response.status_code, 200)
 

@@ -1,10 +1,16 @@
 import os
+import sys
 import json
-import sqlite3
+from dotenv import load_dotenv
+from peewee import SqliteDatabase
+from playhouse.reflection import generate_models, print_model, print_table_sql
 
+load_dotenv()
 
-email_len = 70
-password_len = 80
+db_path = os.getenv("DB_PATH")
+db = SqliteDatabase(db_path)
+models = generate_models(db)
+UserModel = models.get("usermodel")
 
 
 def eprint(*args, **kwargs):
@@ -20,32 +26,28 @@ inputs = get_json_inputs()
 email = inputs.get("email")
 password = inputs.get("password")
 
-if len(email) > email_len:
+if len(email) > UserModel.email.max_length:
     print(json.dumps({"login": False}))
     eprint("Your email is invalid!")
     exit(0)
 
-if len(password) > password_len:
+if len(password) > UserModel.password.max_length:
     print(json.dumps({"login": False}))
     eprint("Your email is invalid!")
     exit(0)
 
-db_path = os.getenv("DB_URI")
-connection = sqlite3.connect(db_path)
-cur = connection.cursor()
+user = None
+try:
+    user = UserModel.get(UserModel.email == email)
 
-user = cur.execute("SELECT * from User WHERE Email = ?", [email]).fetchone()
-
-if not user:
+except:
     print(json.dumps({"login": False}))
     eprint("The user with the given email address was not found!")
     exit(0)
 
-if user[4] != password:
+if user.password != password:
     print(json.dumps({"login": False}))
     eprint("Your password was not match!")
     exit(0)
 
 print(json.dumps({"login": True}))
-
-connection.close()

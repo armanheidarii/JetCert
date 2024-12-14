@@ -1,0 +1,8 @@
+compilation_mode="safe"
+
+[safe]
+compilation_tool="compcert"
+entry_file_name="main.c"
+
+[safe.compcert]
+linked_files=["json-c", "m"]

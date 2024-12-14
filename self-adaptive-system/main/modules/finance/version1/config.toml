@@ -1,0 +1,8 @@
+compilation_mode="fast"
+
+[fast]
+compilation_tool="numba"
+entry_file_name="__main__.py"
+
+[fast.numba]
+entry_func_name="go_fast"
