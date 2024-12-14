@@ -1,16 +1,16 @@
-# Local Files
+# Local
 improve.txt
 document.txt
 
-# Compile Files
+# Compile
 main
 !main/
 __main__
 
-# Cach Folders
+# Cache
 __pycache__
 __jetcert__
 
-# App Files
+# App
 .env
 **/db/data/
