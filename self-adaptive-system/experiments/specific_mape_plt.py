@@ -6,7 +6,7 @@ def process_show(
     x,
     monitor_execution_times,
     analyse_execution_times,
-    planning_execution_times,
+    plan_execution_times,
     execute_execution_times,
 ):
     plt.figure(figsize=(10, 6))
@@ -20,16 +20,16 @@ def process_show(
     )
     plt.plot(
         x,
-        planning_execution_times,
-        label="planning execution times",
+        plan_execution_times,
+        label="plan execution times",
         color="green",
     )
     plt.plot(x, execute_execution_times, label="execute execution times", color="red")
 
-    plt.title("Time Results of the MAPE Cycle")
+    plt.title("Time Results of the MAPE Cycles")
     plt.xlabel("MAPE iteration")
-    plt.ylabel("Time")
-    plt.ylim(-0.02, 0.2)
+    plt.ylabel("Time (s)")
+    plt.ylim(-0.1, 2)
     plt.axhline(0, color="black", linewidth=0.5, ls="--")
     plt.axvline(0, color="black", linewidth=0.5, ls="--")
     plt.grid()
@@ -41,7 +41,7 @@ def show(
     x,
     monitor_execution_times,
     analyse_execution_times,
-    planning_execution_times,
+    plan_execution_times,
     execute_execution_times,
 ):
     process = Process(
@@ -50,7 +50,7 @@ def show(
             x,
             monitor_execution_times,
             analyse_execution_times,
-            planning_execution_times,
+            plan_execution_times,
             execute_execution_times,
         ),
     )

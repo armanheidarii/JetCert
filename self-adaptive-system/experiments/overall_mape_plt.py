@@ -2,10 +2,9 @@ from multiprocessing import Process
 import matplotlib.pyplot as plt
 
 
-def process_show(x, overall_execution_times, safe_intervals):
+def process_show(x, overall_execution_times):
     plt.figure(figsize=(10, 6))
 
-    plt.plot(x, safe_intervals, label="safe intervals", color="green")
     plt.plot(
         x,
         overall_execution_times,
@@ -13,7 +12,7 @@ def process_show(x, overall_execution_times, safe_intervals):
         color="red",
     )
 
-    plt.title("Time Results of the MAPE Cycle")
+    plt.title("Time Results of the MAPE Cycles")
     plt.xlabel("MAPE iteration")
     plt.ylabel("Time")
     plt.ylim(-0.2, 4)
@@ -24,13 +23,6 @@ def process_show(x, overall_execution_times, safe_intervals):
     plt.show()
 
 
-def show(x, overall_execution_times, safe_intervals):
-    process = Process(
-        target=process_show,
-        args=(
-            x,
-            overall_execution_times,
-            safe_intervals,
-        ),
-    )
+def show(x, overall_execution_times):
+    process = Process(target=process_show, args=(x, overall_execution_times))
     process.start()

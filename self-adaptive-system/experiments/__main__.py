@@ -4,68 +4,42 @@ from dotenv import load_dotenv
 
 sys.path.append(".")
 # change: use from pip
-from jetCert import JetCert
+from JetCert import JetCert
+
 
 load_dotenv()
 
-jet_cert = JetCert.create(
+jetcert = JetCert(
     period=2,
     modules_path=os.getenv("MODULES_PATH"),
-    capture_MAPE_data=True,
-    MAPE_data_path=os.getenv("MAPE_DATA_PATH"),
+    config_files_name="config.toml",
+    continuous_deployment=True,
 )
+jetcert.start()
 
-Login = jet_cert.add_module(
-    "login",
-    fast_compilation_tool="python",
-    fast_entry_file_name="__main__",
-    safe_entry_file_name="main",
-    safe_linked_files=["json-c", "sqlite3"],
-)
+Login = jetcert.get_module("login")
+Crypto = jetcert.get_module("cryptography")
+Finance = jetcert.get_module("finance")
+Physics = jetcert.get_module("physics")
 
-Crypto = jet_cert.add_module(
-    "cryptography",
-    safe_entry_file_name="main",
-    safe_linked_files=["json-c", "m"],
-)
+MAPE_data = jetcert.get_MAPE_data(limit=25, offset=2, wait_to_ready=True)
 
-Finance = jet_cert.add_module(
-    "finance",
-    fast_compilation_tool="numba",
-    fast_entry_file_name="__main__",
-    fast_numba_entry_func_name="go_fast",
-)
+x = list(range(0, len(MAPE_data)))
+monitor_execution_times = [item.monitor_execution_time for item in MAPE_data]
+analyse_execution_times = [item.analyse_execution_time for item in MAPE_data]
+plan_execution_times = [item.plan_execution_time for item in MAPE_data]
+execute_execution_times = [item.execute_execution_time for item in MAPE_data]
+overall_execution_times = [item.overall_execution_time for item in MAPE_data]
 
-Physics = jet_cert.add_module(
-    "physics",
-    fast_compilation_tool="numba",
-    fast_entry_file_name="__main__",
-    fast_numba_entry_func_name="go_fast",
-)
+import specific_mape_plt
+import overall_mape_plt
 
-jet_cert.start()
-
-MAPE_data = jet_cert.get_MAPE_data(limit=10, offset=2, wait_to_ready=True)
-
-iterations_count = MAPE_data.get("iterations_count")
-monitor_execution_times = MAPE_data.get("monitor_execution_times")
-analyse_execution_times = MAPE_data.get("analyse_execution_times")
-planning_execution_times = MAPE_data.get("planning_execution_times")
-execute_execution_times = MAPE_data.get("execute_execution_times")
-overall_execution_times = MAPE_data.get("overall_execution_times")
-safe_intervals = MAPE_data.get("safe_intervals")
-
-x = list(range(0, iterations_count))
-
-import MAPE_plt
-import interval_plt
-
-MAPE_plt.show(
+specific_mape_plt.show(
     x,
     monitor_execution_times,
     analyse_execution_times,
-    planning_execution_times,
+    plan_execution_times,
     execute_execution_times,
 )
 
-interval_plt.show(x, overall_execution_times, safe_intervals)
+overall_mape_plt.show(x, overall_execution_times)
