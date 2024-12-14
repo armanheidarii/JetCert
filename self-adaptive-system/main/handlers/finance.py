@@ -1,26 +1,21 @@
-# App Packages
 import json
 from flask import request, make_response
+
 from main import app
-from main.middlewares.login import user_login
+from main.middlewares.user_login import user_login
 from main.modules import Finance, Crypto
 
 
 @app.route("/black-scholes", methods=["GET"])
 @user_login
 def black_scholes(is_login):
-
     if not is_login:
         return make_response("Unauthorized", 401)
 
-    # creates a dictionary of the form data
     data = request.form
-
-    # returns 400 if necessary data is missing
     if not data:
         return make_response("Data is missing!", 400)
 
-    # gets necessary data
     try:
         stockPrice = json.loads(data.get("stockPrice"))
         optionStrike = json.loads(data.get("optionStrike"))
@@ -29,9 +24,8 @@ def black_scholes(is_login):
         Volatility = float(data.get("Volatility"))
 
     except:
-        return make_response("Necessary data is in an invalid form!")
+        return make_response("Necessary data is in an invalid form!", 400)
 
-    # returns 400 if necessary data is missing
     if (
         not stockPrice
         or not optionStrike
@@ -54,7 +48,10 @@ def black_scholes(is_login):
     callResult = response.get("callResult")
     putResult = response.get("putResult")
 
-    return {
-        "callResult": Crypto.run(inputs={"plaintext": callResult}).get("result"),
-        "putResult": Crypto.run(inputs={"plaintext": putResult}).get("result"),
-    }
+    return make_response(
+        {
+            "callResult": Crypto.run(inputs={"plaintext": callResult}).get("result"),
+            "putResult": Crypto.run(inputs={"plaintext": putResult}).get("result"),
+        },
+        200,
+    )
