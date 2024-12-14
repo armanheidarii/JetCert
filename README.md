@@ -8,7 +8,9 @@ pip install -r requirements.txt
 
 ## Usage
 ```python
-python app
+python self-adaptive-system
+python self-adaptive-system/tests
+python self-adaptive-system/experiments
 ```
 
 ## Quick Example
