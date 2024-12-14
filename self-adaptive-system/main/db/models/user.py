@@ -1,14 +1,15 @@
+import uuid
+from peewee import *
+
 from main.db import db
-
-public_id_len = 50
-name_len = 100
-email_len = 70
-password_len = 80
+from main.db.models.base import BaseModel
 
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String(public_id_len), unique=True)
-    name = db.Column(db.String(name_len))
-    email = db.Column(db.String(email_len), unique=True)
-    password = db.Column(db.String(password_len))
+class UserModel(BaseModel):
+    public_id = UUIDField(default=uuid.uuid4, unique=True)
+    name = CharField(max_length=256)
+    email = CharField(max_length=128, unique=True)
+    password = CharField(max_length=128)
+
+
+db.create_tables([UserModel])
