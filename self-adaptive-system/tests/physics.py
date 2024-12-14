@@ -8,7 +8,6 @@ def make_cluster(natoms, radius=20, seed=1981):
 
 
 def input_generator():
-    # for natoms in [100, 1000, 5000]:
     for natoms in [100, 500, 1000, 1500, 2000]:
         cluster = make_cluster(natoms)
         dtype = np.float64

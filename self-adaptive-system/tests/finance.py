@@ -33,7 +33,6 @@ def input_generator():
 
 def validator(input_args, input_kwargs, output):
     actual_call, actual_put = output
-    # use numpy implementation above as reference
     expected_call, expected_put = black_scholes(*input_args, **input_kwargs)
 
     np.testing.assert_allclose(actual_call, expected_call, rtol=1e-5, atol=1e-5)
