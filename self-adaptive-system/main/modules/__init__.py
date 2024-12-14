@@ -3,39 +3,17 @@ import sys
 
 sys.path.append(".")
 # change: use from pip
-from jetCert import JetCert
+from JetCert import JetCert
 
-jet_cert = JetCert.create(
-    period=2,
+jetcert = JetCert(
+    period=4,
     modules_path=os.getenv("MODULES_PATH"),
+    config_files_name="config.toml",
+    continuous_deployment=True,
 )
+jetcert.start()
 
-Login = jet_cert.add_module(
-    "login",
-    fast_compilation_tool="python",
-    fast_entry_file_name="__main__",
-    safe_entry_file_name="main",
-    safe_linked_files=["json-c", "sqlite3"],
-)
-
-Crypto = jet_cert.add_module(
-    "cryptography",
-    safe_entry_file_name="main",
-    safe_linked_files=["json-c", "m"],
-)
-
-Finance = jet_cert.add_module(
-    "finance",
-    fast_compilation_tool="numba",
-    fast_entry_file_name="__main__",
-    fast_numba_entry_func_name="go_fast",
-)
-
-Physics = jet_cert.add_module(
-    "physics",
-    fast_compilation_tool="numba",
-    fast_entry_file_name="__main__",
-    fast_numba_entry_func_name="go_fast",
-)
-
-jet_cert.start()
+Login = jetcert.get_module("login")
+Crypto = jetcert.get_module("cryptography")
+Finance = jetcert.get_module("finance")
+Physics = jetcert.get_module("physics")
