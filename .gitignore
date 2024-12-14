@@ -6,9 +6,11 @@ document.txt
 main
 !main/
 __main__
+
+# Cach Folders
 __pycache__
+__jetcert__
 
 # App Files
 .env
 **/db/data/
-**/experiments/data/
