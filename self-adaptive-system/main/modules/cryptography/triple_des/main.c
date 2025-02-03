@@ -119,7 +119,8 @@ int main(int argc, const char *argv[]) {
   char *cipher = encrypt(msg);
 
   json_object *outputs = json_object_new_object();
-  json_object_object_add(outputs, "algorithm", json_object_new_string("triple_DES"));
+  json_object_object_add(outputs, "algorithm",
+                         json_object_new_string("triple_des"));
   json_object_object_add(outputs, "ciphertext", json_object_new_string(cipher));
 
   fprintf(stdout, "%s",

@@ -14,16 +14,16 @@ def login_plan(login_analyse_data):
 
 
 def crypto_plan(crypto_analyse_data):
-    if "version1" in crypto_analyse_data:
-        return "version1"
+    if "wire" in crypto_analyse_data:
+        return "wire"
 
-    if "version2" in crypto_analyse_data:
-        return "version2"
+    if "shift_cipher" in crypto_analyse_data:
+        return "shift_cipher"
 
-    if "version3" in crypto_analyse_data:
-        return "version3"
+    if "triple_des" in crypto_analyse_data:
+        return "triple_des"
 
-    return "version4"
+    return "rsa"
 
 
 def finance_plan(finance_analyse_data):

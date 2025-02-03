@@ -21,23 +21,21 @@ def login_analyse(monitor_data):
 
 
 def crypto_analyse(monitor_data):
-    network_sniffing = monitor_data.get(
-        "network_sniffing"
-    )
+    network_sniffing = monitor_data.get("network_sniffing")
 
     crypto_analyse_data = []
 
     if network_sniffing <= 100:
-        crypto_analyse_data.append("version4")
+        crypto_analyse_data.append("rsa")
 
     if network_sniffing <= 80:
-        crypto_analyse_data.append("version3")
+        crypto_analyse_data.append("triple_des")
 
     if network_sniffing <= 40:
-        crypto_analyse_data.append("version2")
+        crypto_analyse_data.append("shift_cipher")
 
     if network_sniffing <= 20:
-        crypto_analyse_data.append("version1")
+        crypto_analyse_data.append("wire")
 
     return crypto_analyse_data
 
