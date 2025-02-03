@@ -179,5 +179,9 @@ class Module:
 
         self.current_version_name = current_version_name
 
+    def print_modules(self):
+        for version in self.versions.values():
+            print(version)
+
     def __str__(self):
         return f"<Module {self.module_name} in version {self.current_version_name}>"
