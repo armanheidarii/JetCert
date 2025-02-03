@@ -2,9 +2,9 @@ import os
 import time
 import traceback
 import threading
+import csv
 
 from builder import Builder
-from mape.models.mape import create_MAPE_model
 
 
 class MAPE:
@@ -44,8 +44,16 @@ class MAPE:
         self.is_start_event = threading.Event()
         self.itr = 0
 
-        base_model = self.system.get_base_model()
-        self.MAPE_model = create_MAPE_model(base_model)
+        cache_folder_path = self.system.get_cache_folder_path()
+        self.data_file_name = "mape.csv"
+        self.data_file_path = os.path.join(cache_folder_path, self.data_file_name)
+        self.data_columns = [
+            "Monitor Time",
+            "Analyse Time",
+            "Plan Time",
+            "Execute Time",
+        ]
+        self.data_write(self.data_columns, mode="w")
 
     def get_period(self):
         return self.period
@@ -77,6 +85,11 @@ class MAPE:
     def get_MAPE_model(self):
         return self.MAPE_model
 
+    def data_write(self, data, mode="w"):
+        f = open(self.data_file_path, mode=mode, newline="", encoding="utf-8")
+        data_writer = csv.writer(f)
+        data_writer.writerow(data)
+
     def start(self):
         threading.Thread(target=self.MAPE).start()
         self.is_start_event.wait()
@@ -87,6 +100,8 @@ class MAPE:
         start = time.time()
         response = Builder.run_python_file(self.monitor_path)
         end = time.time()
+        if self.system.is_continuous_deployment_active():
+            self.system.update_CD()
 
         return response.get("result"), end - start
 
@@ -108,38 +123,20 @@ class MAPE:
         if not plan_data:
             raise ValueError(f"The plan_data {plan_data} cannot be empty!")
 
-        start = time.time()
         for module_name, data in plan_data.items():
             module = self.system.get_module(module_name)
             if module:
                 module.execute(data)
-        end = time.time()
-
-        return end - start
 
     def update(self):
         start = time.time()
-        if self.system.is_continuous_deployment_active():
-            self.system.update_CD()
+        monitor, monitor_time = self.monitor()
+        analyse, analyse_time = self.analyse(monitor)
+        plan, plan_time = self.plan(analyse)
+        execute_time = self.period - monitor_time - analyse_time - plan_time
+        self.execute(plan)
 
-        monitor, monitor_execution_time = self.monitor()
-        analyse, analyse_execution_time = self.analyse(monitor)
-        plan, plan_execution_time = self.plan(analyse)
-        execute_execution_time = self.execute(plan)
-
-        overall_execution_time = (
-            monitor_execution_time
-            + analyse_execution_time
-            + plan_execution_time
-            + execute_execution_time
-        )
-        self.MAPE_model.create(
-            monitor_execution_time=monitor_execution_time,
-            analyse_execution_time=analyse_execution_time,
-            plan_execution_time=plan_execution_time,
-            execute_execution_time=execute_execution_time,
-            overall_execution_time=overall_execution_time,
-        )
+        self.data_write([monitor_time, analyse_time, plan_time, execute_time], mode="a")
 
         self.itr += 1
         end = time.time()
@@ -151,11 +148,10 @@ class MAPE:
 
         print(f"start MAPE round 0")
         try:
-            updates_execution_time = self.update()
+            updates_time = self.update()
 
         except:
             raise ValueError(f"The MAPE is not setup correctly!")
-        print(f"finish MAPE round 0")
 
         self.is_start_event.set()
 
@@ -163,32 +159,17 @@ class MAPE:
             try:
                 MAPE_delay = max(
                     0,
-                    self.itr * self.period - last_MAPEs_delay - updates_execution_time,
+                    self.itr * self.period - last_MAPEs_delay - updates_time,
                 )
                 time.sleep(MAPE_delay)
                 last_MAPEs_delay += MAPE_delay
+                print(f"finish MAPE round {self.itr - 1}")
 
                 print(f"start MAPE round {self.itr}")
-                updates_execution_time += self.update()
-                print(f"finish MAPE round {self.itr-1}")
+                updates_time += self.update()
 
             except:
                 traceback.print_exc()
-
-    def get_MAPE_data(self, limit=-1, offset=0, wait_to_ready=False):
-        if not self.is_start_flag:
-            raise ValueError(f"The is_start_flag {self.is_start_flag} is not True!")
-
-        if limit < 0 and limit != -1:
-            raise ValueError(f"The limit cannot be {limit} < 0 and {limit} != -1")
-
-        if offset < 0:
-            raise ValueError(f"The offset cannot be {offset} < 0")
-
-        while wait_to_ready and self.itr <= limit + offset:
-            pass
-
-        return self.MAPE_model.select().offset(offset).limit(limit)
 
     def __str__(self):
         MAPE_status = "start" if self.is_start_flag else "not start"
