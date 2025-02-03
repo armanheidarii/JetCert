@@ -1,0 +1,254 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36" version="26.0.2">
+  <diagram name="Page-1" id="WAwnW2iUXq9Dt1IIiqUG">
+    <mxGraphModel dx="3056" dy="1175" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-2" value="Pipeline" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="-200" y="920" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-4" value="MAPE" style="align=center;strokeColor=#DEEDFF" vertex="1" parent="1">
+          <mxGeometry x="-200" y="960" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-19" value="" style="align=center;strokeColor=#DEEDFF" vertex="1" parent="1">
+          <mxGeometry x="-0.5" y="960" width="1400.5" height="480" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-21" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="100" relative="1" as="geometry">
+            <mxPoint x="23.57" y="1020" as="sourcePoint" />
+            <mxPoint x="1360" y="1020" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-22" value="M" style="align=center;strokeColor=#666666;html=1;fillColor=#f5f5f5;shadow=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="23.57" y="996" width="136.43" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-49" value="Schedule Chart" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="0.5" y="920" width="1399.5" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-57" value="Login" style="align=center;strokeColor=#DEEDFF" vertex="1" parent="1">
+          <mxGeometry x="-200" y="1040" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-58" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="100" relative="1" as="geometry">
+            <mxPoint x="23.07" y="1100" as="sourcePoint" />
+            <mxPoint x="1360" y="1100" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-61" value="Cryptography" style="align=center;strokeColor=#DEEDFF" vertex="1" parent="1">
+          <mxGeometry x="-200" y="1120" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-62" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="100" relative="1" as="geometry">
+            <mxPoint x="23.07" y="1180" as="sourcePoint" />
+            <mxPoint x="1360" y="1180" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-65" value="Finance" style="align=center;strokeColor=#DEEDFF" vertex="1" parent="1">
+          <mxGeometry x="-200" y="1200" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-66" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="100" relative="1" as="geometry">
+            <mxPoint x="23.07" y="1260" as="sourcePoint" />
+            <mxPoint x="1360" y="1260" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-69" value="Physics" style="align=center;strokeColor=#DEEDFF" vertex="1" parent="1">
+          <mxGeometry x="-200" y="1280" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-70" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="100" relative="1" as="geometry">
+            <mxPoint x="23.07" y="1340" as="sourcePoint" />
+            <mxPoint x="1360" y="1340" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-73" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;endArrow=none;endFill=0;dashed=1;dashPattern=8 8;" edge="1" parent="1">
+          <mxGeometry width="100" relative="1" as="geometry">
+            <mxPoint x="1280" y="1480" as="sourcePoint" />
+            <mxPoint x="1280" y="980" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-74" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;endArrow=none;endFill=0;dashed=1;dashPattern=8 8;" edge="1" parent="1">
+          <mxGeometry width="100" relative="1" as="geometry">
+            <mxPoint x="659" y="1480" as="sourcePoint" />
+            <mxPoint x="659.29" y="980" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-75" value="16" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="640" y="1480" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-76" value="32" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="1480" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-78" value="A" style="align=center;strokeColor=#b85450;html=1;fillColor=#f8cecc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="996" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-79" value="P" style="align=center;strokeColor=#d6b656;html=1;fillColor=#fff2cc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="996" width="30" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-80" value="E" style="align=center;html=1;shadow=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="210" y="996" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-81" value="Basic Auth" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="1076" width="620" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-82" value="M" style="align=center;strokeColor=#666666;html=1;fillColor=#f5f5f5;shadow=1;fontColor=#333333;gradientColor=none;" vertex="1" parent="1">
+          <mxGeometry x="660" y="996" width="116.43" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-84" value="A" style="align=center;strokeColor=#b85450;html=1;fillColor=#f8cecc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="776.43" y="996" width="33.57" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-85" value="P" style="align=center;strokeColor=#d6b656;html=1;fillColor=#fff2cc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="810" y="996" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-86" value="E" style="align=center;html=1;shadow=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="830" y="996" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-89" value="Safe Basic Auth" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="1076" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-92" value="Triple DES" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="1156" width="620" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-93" value="RSA" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="1156" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-94" value="Numpy Optimized" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="1236" width="620" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-95" value="Numba JIT Optimized" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="1236" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-96" value="Numba NJIT Array Optimized" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="210" y="1316" width="620" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-97" value="Numba NJIT Scalar Prange Optimized" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="1316" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-198" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;endArrow=oval;endFill=1;" edge="1" parent="1" source="BZpjL1oOdw-9vf9fY1qN-155" target="BZpjL1oOdw-9vf9fY1qN-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-155" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-62.5" y="720" width="215" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-165" value="&lt;font color=&quot;#000099&quot; style=&quot;font-size: 10px;&quot;&gt;&lt;i style=&quot;&quot;&gt;Monitor&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="92.49999999999977" y="850" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-175" value="&lt;ol&gt;&lt;li&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;color: rgb(186, 0, 0); background-color: transparent;&quot;&gt;Get sensor data from SOC&lt;br&gt;&lt;/span&gt;+ CPU Usage = %73&lt;br&gt;+ RAM Usage = %25&lt;br&gt;+ Login Fail = %34&lt;br&gt;+ Network Sniffing = %62&lt;br&gt;&lt;br&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(186, 0, 0);&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;Put new Git updates to priority queue&lt;/span&gt;&lt;br&gt;&lt;/font&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;+ No Update&lt;/span&gt;&lt;br&gt;&lt;/font&gt;&lt;/li&gt;&lt;/ol&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="-70" y="710" width="230" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-200" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=oval;endFill=1;" edge="1" parent="1" source="BZpjL1oOdw-9vf9fY1qN-176" target="BZpjL1oOdw-9vf9fY1qN-78">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-176" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="43.75" y="490" width="252.5" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-177" value="&lt;font color=&quot;#000099&quot; style=&quot;font-size: 10px;&quot;&gt;&lt;i style=&quot;&quot;&gt;Analyse&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="236.24999999999977" y="670" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-178" value="&lt;ol&gt;&lt;li&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;color: rgb(186, 0, 0); background-color: transparent;&quot;&gt;Extracting the allowed versions of each module&lt;br&gt;&lt;/span&gt;+ Login&lt;br&gt;&amp;nbsp; &amp;nbsp; - Basic Auth&lt;br&gt;&amp;nbsp; &amp;nbsp; - Safe Basic Auth&lt;br&gt;+ Cryptography&lt;br&gt;&amp;nbsp; &amp;nbsp; - Triple DES&lt;br&gt;&amp;nbsp; &amp;nbsp; - RSA&lt;br&gt;+ Finance&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numpy Optimized&lt;br&gt;+ Physics&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numba NJIT Array Optimized&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numpy Optimized&lt;br&gt;&lt;/font&gt;&lt;/li&gt;&lt;/ol&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="35" y="480" width="270" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-199" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;endArrow=oval;endFill=1;" edge="1" parent="1" source="BZpjL1oOdw-9vf9fY1qN-181" target="BZpjL1oOdw-9vf9fY1qN-79">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-181" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="188.75" y="720" width="232.5" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-182" value="&lt;font color=&quot;#000099&quot; style=&quot;font-size: 10px;&quot;&gt;&lt;i style=&quot;&quot;&gt;Plan&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="381.2499999999998" y="860" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-183" value="&lt;ol&gt;&lt;li&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;color: rgb(186, 0, 0); background-color: transparent;&quot;&gt;Selecting the best version of each module&lt;br&gt;&lt;/span&gt;+ Login&lt;br&gt;&amp;nbsp; &amp;nbsp; - Basic Auth&lt;br&gt;+ Cryptography&lt;br&gt;&amp;nbsp; &amp;nbsp; - Triple DES&lt;br&gt;+ Finance&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numpy Optimized&lt;br&gt;+ Physics&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numba NJIT Array Optimized&lt;br&gt;&lt;/font&gt;&lt;/li&gt;&lt;/ol&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="180" y="710" width="250" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-201" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=oval;endFill=1;" edge="1" parent="1" source="BZpjL1oOdw-9vf9fY1qN-184" target="BZpjL1oOdw-9vf9fY1qN-80">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-184" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="335" y="580" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-185" value="&lt;font color=&quot;#000099&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;i&gt;Execute&lt;/i&gt;&lt;/span&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="474.4999999999998" y="670" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-186" value="&lt;ol&gt;&lt;li&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;color: rgb(186, 0, 0); background-color: transparent;&quot;&gt;Updating the config of each module &lt;br&gt;with the best version calculated &lt;br&gt;in the planning phase&lt;/span&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font color=&quot;#ba0000&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;Ready to respond to requests&lt;br&gt;with the updated version&lt;/span&gt;&lt;/font&gt;&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="325" y="570" width="220" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-223" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=oval;endFill=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;curved=1;" edge="1" parent="1" source="BZpjL1oOdw-9vf9fY1qN-202" target="BZpjL1oOdw-9vf9fY1qN-82">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="611" y="970" />
+              <mxPoint x="718" y="970" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-202" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="557.5" y="700" width="215" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-203" value="&lt;font color=&quot;#000099&quot; style=&quot;font-size: 10px;&quot;&gt;&lt;i style=&quot;&quot;&gt;Monitor&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="712.4999999999998" y="860" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-204" value="&lt;ol&gt;&lt;li&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;color: rgb(186, 0, 0); background-color: transparent;&quot;&gt;Get sensor data from SOC&lt;br&gt;&lt;/span&gt;+ CPU Usage = %25&lt;br&gt;+ RAM Usage = %19&lt;br&gt;+ Login Fail = %74&lt;br&gt;+ Network Sniffing = %85&lt;br&gt;&lt;br&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(186, 0, 0);&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;Put new Git updates to priority queue&lt;/span&gt;&lt;br&gt;&lt;/font&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;+ Login&lt;br&gt;&lt;/span&gt;&amp;nbsp; &amp;nbsp; -&amp;nbsp;&lt;/font&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;Safe Basic Auth&lt;br&gt;+&amp;nbsp;Finance&lt;br&gt;&amp;nbsp; &amp;nbsp; -&amp;nbsp;Numpy Optimized&lt;br&gt;&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="550" y="690" width="230" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-224" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=oval;endFill=1;" edge="1" parent="1" source="BZpjL1oOdw-9vf9fY1qN-205" target="BZpjL1oOdw-9vf9fY1qN-84">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-205" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="666.96" y="460" width="252.5" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-206" value="&lt;font color=&quot;#000099&quot; style=&quot;font-size: 10px;&quot;&gt;&lt;i style=&quot;&quot;&gt;Analyse&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="859.4599999999998" y="650" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-207" value="&lt;ol&gt;&lt;li&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;color: rgb(186, 0, 0); background-color: transparent;&quot;&gt;Extracting the allowed versions of each module&lt;br&gt;&lt;/span&gt;+ Login&lt;br&gt;&amp;nbsp; &amp;nbsp; - Safe Basic Auth&lt;br&gt;+ Cryptography&lt;br&gt;&amp;nbsp; &amp;nbsp; - RSA&lt;br&gt;+ Finance&lt;br&gt;&amp;nbsp; &amp;nbsp; -&amp;nbsp;Numba JIT Optimized&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numpy Optimized&lt;br&gt;+ Physics&lt;br&gt;&amp;nbsp; &amp;nbsp; -&amp;nbsp;Numba NJIT Scalar Prange Optimized&lt;br&gt;&amp;nbsp; &amp;nbsp; -&amp;nbsp;Numba NJIT Scalar Optimized&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numba NJIT Array Optimized&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numpy Optimized&lt;br&gt;&lt;/font&gt;&lt;/li&gt;&lt;/ol&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="658.21" y="450" width="270" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-216" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;curved=1;endArrow=oval;endFill=1;" edge="1" parent="1" source="BZpjL1oOdw-9vf9fY1qN-208" target="BZpjL1oOdw-9vf9fY1qN-85">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-208" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="808.75" y="700" width="232.5" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-209" value="&lt;font color=&quot;#000099&quot; style=&quot;font-size: 10px;&quot;&gt;&lt;i style=&quot;&quot;&gt;Plan&lt;/i&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1001.2499999999998" y="840" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-210" value="&lt;ol&gt;&lt;li&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;color: rgb(186, 0, 0); background-color: transparent;&quot;&gt;Selecting the best version of each module&lt;br&gt;&lt;/span&gt;+ Login&lt;br&gt;&amp;nbsp; &amp;nbsp; - Safe Basic Auth&lt;br&gt;+ Cryptography&lt;br&gt;&amp;nbsp; &amp;nbsp; - RSA&lt;br&gt;+ Finance&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numba JIT Optimized&lt;br&gt;+ Physics&lt;br&gt;&amp;nbsp; &amp;nbsp; - Numba NJIT Scalar Prange Optimized&lt;br&gt;&lt;/font&gt;&lt;/li&gt;&lt;/ol&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="800" y="690" width="250" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-218" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=oval;endFill=1;" edge="1" parent="1" source="BZpjL1oOdw-9vf9fY1qN-211" target="BZpjL1oOdw-9vf9fY1qN-86">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-211" value="" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="955" y="560" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-212" value="&lt;font color=&quot;#000099&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;&lt;i&gt;Execute&lt;/i&gt;&lt;/span&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1094.4999999999998" y="650" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-213" value="&lt;ol&gt;&lt;li&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;&lt;span style=&quot;color: rgb(186, 0, 0); background-color: transparent;&quot;&gt;Updating the config of each module &lt;br&gt;with the best version calculated &lt;br&gt;in the planning phase&lt;/span&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font color=&quot;#ba0000&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;Ready to respond to requests&lt;br&gt;with the updated version&lt;/span&gt;&lt;/font&gt;&lt;br&gt;&lt;/li&gt;&lt;/ol&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="945" y="550" width="220" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-225" value="CI/CD" style="align=center;strokeColor=#DEEDFF" vertex="1" parent="1">
+          <mxGeometry x="-200" y="1360" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-226" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="100" relative="1" as="geometry">
+            <mxPoint x="23.07" y="1420" as="sourcePoint" />
+            <mxPoint x="1360" y="1420" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-228" value="L (SBA)" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="1396" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="BZpjL1oOdw-9vf9fY1qN-230" value="F (NO)" style="align=center;strokeColor=#6c8ebf;html=1;fillColor=#dae8fc;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="1396" width="80" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
