@@ -27,10 +27,10 @@ def crypto_plan(crypto_analyse_data):
 
 
 def finance_plan(finance_analyse_data):
-    if "version2" in finance_analyse_data:
-        return "version2"
+    if "numba_optimized" in finance_analyse_data:
+        return "numba_optimized"
 
-    return "version1"
+    return "numpy_optimized"
 
 
 def physics_plan(physics_analyse_data):

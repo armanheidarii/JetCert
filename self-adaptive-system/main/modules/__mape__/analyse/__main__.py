@@ -47,10 +47,10 @@ def finance_analyse(monitor_data):
     finance_analyse_data = []
 
     if RAM_usage <= 100 and CPU_usage <= 100:
-        finance_analyse_data.append("version1")
+        finance_analyse_data.append("numpy_optimized")
 
     if RAM_usage <= 40 and CPU_usage <= 50:
-        finance_analyse_data.append("version2")
+        finance_analyse_data.append("numba_optimized")
 
     return finance_analyse_data
 
