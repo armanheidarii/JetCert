@@ -62,16 +62,16 @@ def physics_analyse(monitor_data):
     physics_analyse_data = []
 
     if RAM_usage <= 100 and CPU_usage <= 100:
-        physics_analyse_data.append("version1")
+        physics_analyse_data.append("numpy_optimized")
 
     if RAM_usage <= 80 and CPU_usage <= 90:
-        physics_analyse_data.append("version2")
+        physics_analyse_data.append("numba_njit_array_optimized")
 
     if RAM_usage <= 60 and CPU_usage <= 70:
-        physics_analyse_data.append("version3")
+        physics_analyse_data.append("numba_njit_scalar_optimized")
 
     if RAM_usage <= 20 and CPU_usage <= 30:
-        physics_analyse_data.append("version4")
+        physics_analyse_data.append("numba_njit_scalar_prange_optimized")
 
     return physics_analyse_data
 

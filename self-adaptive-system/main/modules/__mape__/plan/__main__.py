@@ -34,16 +34,16 @@ def finance_plan(finance_analyse_data):
 
 
 def physics_plan(physics_analyse_data):
-    if "version4" in physics_analyse_data:
-        return "version4"
+    if "numba_njit_scalar_prange_optimized" in physics_analyse_data:
+        return "numba_njit_scalar_prange_optimized"
 
-    if "version3" in physics_analyse_data:
-        return "version3"
+    if "numba_njit_scalar_optimized" in physics_analyse_data:
+        return "numba_njit_scalar_optimized"
 
-    if "version2" in physics_analyse_data:
-        return "version2"
+    if "numba_njit_array_optimized" in physics_analyse_data:
+        return "numba_njit_array_optimized"
 
-    return "version1"
+    return "numpy_optimized"
 
 
 analyse_data = get_json_inputs()
