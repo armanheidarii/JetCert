@@ -1,3 +1,5 @@
+# JetCert 🚀
+
 <p align="center">
 <img alt = "JetCert Architecture Image"
     src="https://github.com/armanheidarii/JetCert/blob/main/JetCert/docs/JetCert-HLD.png">
