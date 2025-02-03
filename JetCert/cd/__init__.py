@@ -28,6 +28,7 @@ class CD:
                 f"The is_git_head_hash {is_git_head_hash_invalid} is not valid!"
             )
         self.git_head_hash = response.get("result").strip()
+        self.lock = threading.Lock()
 
     def get_system(self):
         return self.system
@@ -40,6 +41,9 @@ class CD:
 
     def get_git_head_hash(self):
         return self.git_head_hash
+
+    def get_lock(self):
+        return self.lock
 
     def start(self):
         threading.Thread(target=self.build).start()
@@ -102,6 +106,7 @@ class CD:
             self.put_update(update)
 
     def update(self):
+        self.lock.acquire()
         modules_path = self.system.get_modules_path()
         response = Builder.git_pull(path=modules_path)
         is_git_pull_invalid = response.get("process").get("returncode")
@@ -129,6 +134,7 @@ class CD:
                 f"The is_git_head_hash {is_git_head_hash_invalid} is not valid!"
             )
         self.git_head_hash = response.get("result").strip()
+        self.lock.release()
 
     def build(self):
         while True:
