@@ -7,10 +7,10 @@ def get_json_inputs():
 
 
 def login_plan(login_analyse_data):
-    if "version1" in login_analyse_data:
-        return "version1"
+    if "basic_auth" in login_analyse_data:
+        return "basic_auth"
 
-    return "version2"
+    return "safe_basic_auth"
 
 
 def crypto_plan(crypto_analyse_data):

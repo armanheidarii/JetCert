@@ -12,10 +12,10 @@ def login_analyse(monitor_data):
     login_analyse_data = []
 
     if login_fail <= 100 and RAM_usage <= 100:
-        login_analyse_data.append("version2")
+        login_analyse_data.append("safe_basic_auth")
 
     if login_fail <= 40 and RAM_usage <= 45:
-        login_analyse_data.append("version1")
+        login_analyse_data.append("basic_auth")
 
     return login_analyse_data
 
