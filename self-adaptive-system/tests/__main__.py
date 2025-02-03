@@ -25,6 +25,8 @@ class TestJetCert(unittest.TestCase):
         }
 
         response = requests.post(url, data=data)
+        print("SignUp")
+        print(response.text, "\n")
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.text, "Successfully registered.")
@@ -48,6 +50,8 @@ class TestJetCert(unittest.TestCase):
             auth=HTTPBasicAuth("armanheids@gmail.com", "arman@JC"),
             data=data,
         )
+        print("Finance")
+        print(response.text, "\n")
 
         self.assertEqual(response.status_code, 200)
 
@@ -66,6 +70,8 @@ class TestJetCert(unittest.TestCase):
             auth=HTTPBasicAuth("armanheids@gmail.com", "arman@JC"),
             data=data,
         )
+        print("Physics")
+        print(response.text, "\n")
 
         self.assertEqual(response.status_code, 200)
 
@@ -77,6 +83,8 @@ class TestJetCert(unittest.TestCase):
         }
 
         response = requests.get(url, headers=headers)
+        print("Get All Users")
+        print(response.text, "\n")
 
         self.assertEqual(response.status_code, 200)
 
@@ -88,6 +96,8 @@ class TestJetCert(unittest.TestCase):
         }
 
         response = requests.delete(url, headers=headers)
+        print("Delete User")
+        print(response.text, "\n")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.text, "User deleted successfully")
