@@ -104,7 +104,8 @@ class JetCert:
             modules_list.remove(MAPE_folder_name)
 
         for module_name in modules_list:
-            self.add_module(module_name)
+            module = self.add_module(module_name)
+            print(f"Parsing {module} was successful.")
 
     def parse(self):
         self.parse_modules()
