@@ -1,6 +1,5 @@
 import os
 import sys
-from peewee import *
 
 sys.path.append("JetCert")
 
@@ -8,7 +7,6 @@ from utils import Utils
 from module import Module
 from mape import MAPE
 from cd import CD
-from models.base import create_base_model
 
 
 class JetCert:
@@ -44,11 +42,6 @@ class JetCert:
         self.cache_folder_path = cache_folder_path
 
         Utils.clear_folder(self.cache_folder_path)
-
-        self.db_name = "jetcert.db"
-        self.db_path = os.path.join(self.cache_folder_path, self.db_name)
-        self.db = SqliteDatabase(self.db_path)
-        self.base_model = create_base_model(self.db)
 
         self.MAPE = MAPE(self, period=period)
         self.CD = CD(self, continuous_deployment)
@@ -173,16 +166,6 @@ class JetCert:
             self.CD.start()
 
         self.is_start_flag = True
-
-    def get_MAPE_data(self, limit=-1, offset=0, wait_to_ready=False):
-        if not self.is_start_flag:
-            raise ValueError(f"The system {self} not started!")
-
-        return self.MAPE.get_MAPE_data(
-            limit=limit,
-            offset=offset,
-            wait_to_ready=wait_to_ready,
-        )
 
     def __str__(self):
         period = self.MAPE.get_period()
