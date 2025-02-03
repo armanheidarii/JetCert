@@ -2,6 +2,7 @@ import queue
 import threading
 
 from builder import Builder
+from cd.update import Update
 
 
 class CD:
@@ -104,6 +105,7 @@ class CD:
 
         for update in updates:
             self.put_update(update)
+            print(f"{update} was added to priority queue.")
 
     def update(self):
         self.lock.acquire()
@@ -143,7 +145,7 @@ class CD:
                     update = self.prioritize_updating_queue.get()
                     update.build()
 
-                    print(update)
+                    print(f"{update} was built.")
 
             except:
                 self.put_update(update)
