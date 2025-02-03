@@ -149,6 +149,7 @@ class MAPE:
         print(f"start MAPE round 0")
         try:
             updates_time = self.update()
+            self.system.print_modules()
 
         except:
             raise ValueError(f"The MAPE is not setup correctly!")
@@ -163,10 +164,11 @@ class MAPE:
                 )
                 time.sleep(MAPE_delay)
                 last_MAPEs_delay += MAPE_delay
-                print(f"finish MAPE round {self.itr - 1}")
+                print(f"finish MAPE round {self.itr - 1}\n")
 
                 print(f"start MAPE round {self.itr}")
                 updates_time += self.update()
+                self.system.print_modules()
 
             except:
                 traceback.print_exc()
