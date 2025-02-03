@@ -168,6 +168,10 @@ class JetCert:
 
         self.is_start_flag = True
 
+    def print_modules(self):
+        for module in self.modules.values():
+            print(module)
+
     def __str__(self):
         period = self.MAPE.get_period()
         MAPE_status = "start" if self.is_start_flag else "not start"
