@@ -17,25 +17,25 @@ class MAPE:
             raise ValueError(f"The period {period} is not positive!")
         self.period = period
 
-        self.MAPE_folder_name = "__mape__"
+        self.mape_folder_name = "__mape__"
 
         modules_path = self.system.get_modules_path()
-        MAPE_folder_path = os.path.join(modules_path, self.MAPE_folder_name)
-        if not os.path.exists(MAPE_folder_path):
-            raise ValueError(f"The MAPE_folder_path {MAPE_folder_path} does not exist!")
-        self.MAPE_folder_path = MAPE_folder_path
+        mape_folder_path = os.path.join(modules_path, self.mape_folder_name)
+        if not os.path.exists(mape_folder_path):
+            raise ValueError(f"The mape_folder_path {mape_folder_path} does not exist!")
+        self.mape_folder_path = mape_folder_path
 
-        monitor_path = os.path.join(self.MAPE_folder_path, "monitor")
+        monitor_path = os.path.join(self.mape_folder_path, "monitor")
         if not os.path.exists(monitor_path):
             raise ValueError(f"The monitor_path {monitor_path} does not exist!")
         self.monitor_path = monitor_path
 
-        analyse_path = os.path.join(self.MAPE_folder_path, "analyse")
+        analyse_path = os.path.join(self.mape_folder_path, "analyse")
         if not os.path.exists(analyse_path):
             raise ValueError(f"The analyse_path {analyse_path} does not exist!")
         self.analyse_path = analyse_path
 
-        plan_path = os.path.join(self.MAPE_folder_path, "plan")
+        plan_path = os.path.join(self.mape_folder_path, "plan")
         if not os.path.exists(plan_path):
             raise ValueError(f"The plan_path {plan_path} does not exist!")
         self.plan_path = plan_path
@@ -58,11 +58,11 @@ class MAPE:
     def get_period(self):
         return self.period
 
-    def get_MAPE_folder_name(self):
-        return self.MAPE_folder_name
+    def get_mape_folder_name(self):
+        return self.mape_folder_name
 
-    def get_MAPE_folder_path(self):
-        return self.MAPE_folder_path
+    def get_mape_folder_path(self):
+        return self.mape_folder_path
 
     def get_monitor_path(self):
         return self.monitor_path
@@ -82,8 +82,8 @@ class MAPE:
     def get_itr(self):
         return self.itr
 
-    def get_MAPE_model(self):
-        return self.MAPE_model
+    def get_mape_model(self):
+        return self.mape_model
 
     def data_write(self, data, mode="w"):
         f = open(self.data_file_path, mode=mode, newline="", encoding="utf-8")
@@ -91,7 +91,7 @@ class MAPE:
         data_writer.writerow(data)
 
     def start(self):
-        threading.Thread(target=self.MAPE).start()
+        threading.Thread(target=self.mape).start()
         self.is_start_event.wait()
 
         self.is_start_flag = True
@@ -101,7 +101,9 @@ class MAPE:
         response = Builder.run_python_file(self.monitor_path)
         end = time.time()
         if self.system.is_continuous_deployment_active():
-            self.system.update_CD()
+            start = time.time()
+            self.system.update_cd()
+            end = time.time()
 
         return response.get("result"), end - start
 
@@ -143,36 +145,37 @@ class MAPE:
 
         return end - start
 
-    def MAPE(self):
-        last_MAPEs_delay = 0
+    def mape(self):
+        last_mapes_delay = 0
 
-        print(f"start MAPE round 0")
+        self.system.logger.info(f"start MAPE round 0")
         try:
             updates_time = self.update()
-            self.system.print_modules()
+            self.system.log_modules()
 
-        except:
+        except ValueError:
+            print(ValueError)
             raise ValueError(f"The MAPE is not setup correctly!")
 
         self.is_start_event.set()
 
         while True:
             try:
-                MAPE_delay = max(
+                mape_delay = max(
                     0,
-                    self.itr * self.period - last_MAPEs_delay - updates_time,
+                    self.itr * self.period - last_mapes_delay - updates_time,
                 )
-                time.sleep(MAPE_delay)
-                last_MAPEs_delay += MAPE_delay
-                print(f"finish MAPE round {self.itr - 1}\n")
+                time.sleep(mape_delay)
+                last_mapes_delay += mape_delay
+                self.system.logger.info(f"finish MAPE round {self.itr - 1}\n")
 
-                print(f"start MAPE round {self.itr}")
+                self.system.logger.info(f"start MAPE round {self.itr}")
                 updates_time += self.update()
-                self.system.print_modules()
+                self.system.log_modules()
 
             except:
-                traceback.print_exc()
+                self.system.logger.error(traceback.format_exc())
 
     def __str__(self):
-        MAPE_status = "start" if self.is_start_flag else "not start"
-        return f"<MAPE ({MAPE_status}) in {self.period}>"
+        mape_status = "start" if self.is_start_flag else "not start"
+        return f"<MAPE ({mape_status}) in {self.period}>"
