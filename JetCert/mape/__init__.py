@@ -154,7 +154,6 @@ class MAPE:
             self.system.log_modules()
 
         except ValueError:
-            print(ValueError)
             raise ValueError(f"The MAPE is not setup correctly!")
 
         self.is_start_event.set()
