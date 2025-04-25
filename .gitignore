@@ -1,6 +1,5 @@
-# Local files
-improve.txt
-document.txt
+# Improve files
+improve.*
 
 # Compile files
 main
