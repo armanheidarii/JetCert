@@ -105,7 +105,7 @@ class CD:
 
         for update in updates:
             self.put_update(update)
-            print(f"{update} was added to priority queue.")
+            self.system.logger.info(f"{update} was added to priority queue.")
 
     def update(self):
         self.lock.acquire()
@@ -145,11 +145,11 @@ class CD:
                     update = self.prioritize_updating_queue.get()
                     update.build()
 
-                    print(f"{update} was built.")
+                    self.system.logger.info(f"{update} was built.")
 
             except:
                 self.put_update(update)
 
     def __str__(self):
-        CD_status = "start" if self.is_start_flag else "not start"
-        return f"<CD ({CD_status}) in the last git head hash {self.git_head_hash}>"
+        cd_status = "start" if self.is_start_flag else "not start"
+        return f"<CD ({cd_status}) in the last git head hash {self.git_head_hash}>"
