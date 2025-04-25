@@ -179,9 +179,15 @@ class Module:
 
         self.current_version_name = current_version_name
 
-    def print_modules(self):
+    def log_versions(self, before_each="", after_each=""):
         for version in self.versions.values():
-            print(version)
+            self.system.logger.info(f"{before_each}{version}{after_each}")
 
     def __str__(self):
-        return f"<Module {self.module_name} in version {self.current_version_name}>"
+        version_str = (
+            ""
+            if not self.current_version_name
+            else f" in version {self.current_version_name}"
+        )
+
+        return f"<Module {self.module_name}{version_str}>"
