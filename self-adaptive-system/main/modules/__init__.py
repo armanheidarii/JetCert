@@ -2,14 +2,14 @@ import os
 import sys
 
 sys.path.append(".")
-# change: use from pip
+
 from JetCert import JetCert
 
 jetcert = JetCert(
     period=8,
     modules_path=os.getenv("MODULES_PATH"),
     config_files_name="config.toml",
-    continuous_deployment=False,  # CI/CD can be true
+    continuous_deployment=False,
 )
 jetcert.start()
 
