@@ -3,6 +3,7 @@ import sys
 
 sys.path.append("JetCert")
 
+from logger import Logger
 from utils import Utils
 from module import Module
 from mape import MAPE
@@ -17,6 +18,8 @@ class JetCert:
         config_files_name="config.toml",
         continuous_deployment=False,
     ):
+        self.logger = Logger(self)
+
         if not os.path.exists(modules_path):
             raise ValueError(f"The modules_path {modules_path} does not exist!")
         self.modules_path = os.path.abspath(modules_path)
@@ -43,8 +46,8 @@ class JetCert:
 
         Utils.clear_folder(self.cache_folder_path)
 
-        self.MAPE = MAPE(self, period=period)
-        self.CD = CD(self, continuous_deployment)
+        self.mape = MAPE(self, period=period)
+        self.cd = CD(self, continuous_deployment)
 
         self.parse()
 
@@ -75,17 +78,17 @@ class JetCert:
     def get_all_modules(self):
         return self.modules.copy()
 
-    def get_MAPE(self):
-        return self.MAPE
+    def get_mape(self):
+        return self.mape
 
     def get_period(self):
-        return self.MAPE.get_period()
+        return self.mape.get_period()
 
     def get_CD(self):
-        return self.CD
+        return self.cd
 
     def is_continuous_deployment_active(self):
-        return self.CD.is_continuous_deployment_active()
+        return self.cd.is_continuous_deployment_active()
 
     def parse_modules(self):
         modules_list = Utils.list_folders(self.modules_path)
@@ -99,13 +102,14 @@ class JetCert:
         if cache_folder_name in modules_list:
             modules_list.remove(cache_folder_name)
 
-        MAPE_folder_name = self.MAPE.get_MAPE_folder_name()
-        if MAPE_folder_name in modules_list:
-            modules_list.remove(MAPE_folder_name)
+        mape_folder_name = self.mape.get_mape_folder_name()
+        if mape_folder_name in modules_list:
+            modules_list.remove(mape_folder_name)
 
         for module_name in modules_list:
             module = self.add_module(module_name)
-            print(f"Parsing {module} was successful.")
+            self.logger.info(f"Parsing {module} was successful.")
+        self.logger.info(f"Parsing {len(modules_list)} modules successfully.\n")
 
     def parse(self):
         self.parse_modules()
@@ -157,25 +161,26 @@ class JetCert:
         module = self.get_module(module_name)
         module.execute(current_version_name)
 
-    def update_CD(self):
-        self.CD.update()
+    def update_cd(self):
+        self.cd.update()
 
     def start(self):
-        self.MAPE.start()
+        self.mape.start()
 
-        if self.CD.is_continuous_deployment_active():
-            self.CD.start()
+        if self.cd.is_continuous_deployment_active():
+            self.cd.start()
 
         self.is_start_flag = True
 
-    def print_modules(self):
+    def log_modules(self, before_each="", after_each=""):
         for module in self.modules.values():
-            print(module)
+            self.logger.info(f"{before_each}{module}{after_each}")
 
     def __str__(self):
-        period = self.MAPE.get_period()
-        MAPE_status = "start" if self.is_start_flag else "not start"
+        period = self.mape.get_period()
+        mape_status = "start" if self.is_start_flag else "not start"
         is_continuous_deployment_active = (
-            "active" if self.CD.is_continuous_deployment_active() else "inactive"
+            "active" if self.cd.is_continuous_deployment_active() else "inactive"
         )
-        return f"<JetCert ({MAPE_status}) in period {period} with {is_continuous_deployment_active}>"
+
+        return f"<JetCert ({mape_status}) in period {period} with {is_continuous_deployment_active}>"
