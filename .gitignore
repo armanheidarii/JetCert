@@ -1,15 +1,15 @@
-# Improvment files
+# Improvment
 improve.*
 
-# Compile files
+# Compile
 main
 !main/
 __main__
 
-# Cache files
+# Cache
 __pycache__
 __jetcert__
 
-# App files
+# App
 .env
 **/db/data/
