@@ -2,7 +2,7 @@ import json
 from flask import request, make_response
 
 from main import app
-from main.middlewares.user_login import user_login
+from main.middlewares import user_login
 from main.modules import Physics, Crypto
 
 
@@ -19,7 +19,7 @@ def lennard_jones(is_login):
     try:
         cluster = json.loads(data.get("cluster"))
 
-    except:
+    except Exception as e:
         return make_response("Necessary data is in an invalid form!", 400)
 
     if not cluster:

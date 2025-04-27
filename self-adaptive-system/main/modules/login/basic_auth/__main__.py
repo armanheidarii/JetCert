@@ -11,7 +11,7 @@ load_dotenv()
 db_path = os.getenv("DB_PATH")
 db = SqliteDatabase(db_path)
 models = generate_models(db)
-UserModel = models.get("usermodel")
+User = models.get("user")
 
 
 def eprint(*args, **kwargs):
@@ -27,21 +27,21 @@ inputs = get_json_inputs()
 email = inputs.get("email")
 password = inputs.get("password")
 
-if len(email) > UserModel.email.max_length:
+if len(email) > User.email.max_length:
     print(json.dumps({"login": False}))
     eprint("Your email is invalid!")
     exit(0)
 
-if len(password) > UserModel.password.max_length:
+if len(password) > User.password.max_length:
     print(json.dumps({"login": False}))
     eprint("Your email is invalid!")
     exit(0)
 
 user = None
 try:
-    user = UserModel.get(UserModel.email == email)
+    user = User.get(User.email == email)
 
-except:
+except Exception as e:
     print(json.dumps({"login": False}))
     eprint("The user with the given email address was not found!")
     exit(0)

@@ -17,9 +17,9 @@ char db_path[] = "/home/arman/develop/compiler-artifact/jetCert/"
                  "self-adaptive-system/main/db/data/"
                  "jetcert.db";
 
-struct UserModel *user;
+struct User *user;
 
-struct UserModel {
+struct User {
   char *email;
   char *password;
 };
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   }
 
   /* Create SQL statement */
-  sprintf(sql, "SELECT * from UserModel WHERE Email = \"%s\"", email);
+  sprintf(sql, "SELECT * from User WHERE Email = \"%s\"", email);
 
   /* Execute SQL statement */
   rc = sqlite3_exec(db, sql, callback, (void *)data, &zErrMsg);
@@ -148,7 +148,7 @@ const char *get_json_value(json_object *json, char *key) {
 
 static int callback(void *data, int argc, char **argv, char **azColName) {
   if (argc > 0) {
-    user = (struct UserModel *)malloc(sizeof(struct UserModel));
+    user = (struct User *)malloc(sizeof(struct User));
 
     user->email = calloc(email_len + 1, sizeof(char));
     strcpy(user->email, argv[3]);

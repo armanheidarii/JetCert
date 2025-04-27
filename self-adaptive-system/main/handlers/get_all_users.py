@@ -1,8 +1,8 @@
 from flask import request, make_response
 
-from main.db.models.user import UserModel
+from main.db.models import User
 from main import app
-from main.middlewares.admin_login import admin_login
+from main.middlewares import admin_login
 from main.modules import Crypto
 
 
@@ -12,7 +12,7 @@ def get_all_users(is_login):
     if not is_login:
         return make_response("Unauthorized", 401)
 
-    users = UserModel.select()
+    users = User.select()
 
     outputs = []
     for user in users:
