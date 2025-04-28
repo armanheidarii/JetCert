@@ -109,7 +109,7 @@ class Builder:
 
     @classmethod
     def run_python_file(cls, entry_file_path, inputs=None):
-        cmd = f"""python {entry_file_path}"""
+        cmd = f"""python3 {entry_file_path}"""
         response = cls.run_cmd(cmd, inputs=inputs)
 
         process = response.get("process")
