@@ -1,1 +1,4 @@
-flask_sqlalchemy
+python-dotenv==1.0.1
+peewee==3.17.6
+Flask==3.0.3
+waitress==3.0.2
