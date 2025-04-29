@@ -57,6 +57,6 @@ docker exec -it jetcert_container python3 /home/self-adaptive-system/tests
 
 After traversing 3 cycles of MAPE, the experiments are generated in the directory /home/self-adaptive-system/main/modules/__jetcert__ of the Docker container. You can copy and view these experiments from the Docker container to your system using the command below:
 ```python
-docker cp jetcert_container:/home/self-adaptive-system/main/modules/__jetcert__ [your_system_path]
+docker cp jetcert_container:/home/self-adaptive-system/main/modules/__jetcert__ [your_system_path]/jetcert_experiments
 ```
 In the above command, replace [your_system_path] with the path where you want the JetCert experiments to be copied.
