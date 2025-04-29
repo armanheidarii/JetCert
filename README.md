@@ -60,3 +60,5 @@ After traversing 3 cycles of MAPE, the experiments are generated in the director
 docker cp jetcert_container:/home/self-adaptive-system/main/modules/__jetcert__ [your_system_path]/jetcert_experiments
 ```
 In the above command, replace [your_system_path] with the path where you want the JetCert experiments to be copied.
+
+To view the complete source code of the project, you can use [this GitHub link](https://github.com/armanheidarii/JetCert).
