@@ -6,7 +6,7 @@ sys.path.append(".")
 from JetCert import JetCert
 
 jetcert = JetCert(
-    period=8,
+    period=16,
     modules_path=os.getenv("MODULES_PATH"),
     config_files_name="config.toml",
     continuous_deployment=False,
