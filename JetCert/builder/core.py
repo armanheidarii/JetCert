@@ -50,7 +50,7 @@ class Builder:
     @classmethod
     def compile_compcert_file(cls, entry_file_path, linked_files=[]):
         entry_base_file_path = Utils.get_base_file_path(entry_file_path)
-        base_cmd = f"""gcc {entry_file_path}"""
+        base_cmd = f"""./builder/CompCert/ccomp {entry_file_path}"""
         linked_cmd = " ".join([f"-l{linked_file}" for linked_file in linked_files])
         output_cmd = f"""-o {entry_base_file_path}"""
         cmd = f"""{base_cmd} {linked_cmd} {output_cmd}"""
