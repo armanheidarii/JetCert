@@ -48,7 +48,7 @@ class MAPE:
         self.data_file_name = "mape.csv"
         self.data_file_path = os.path.join(cache_folder_path, self.data_file_name)
         self.data_columns = [
-            "Monitor Time",
+            "Period Number" "Monitor Time",
             "Analyse Time",
             "Plan Time",
             "Execute Time",
@@ -138,7 +138,10 @@ class MAPE:
         execute_time = self.period - monitor_time - analyse_time - plan_time
         self.execute(plan)
 
-        self.data_write([monitor_time, analyse_time, plan_time, execute_time], mode="a")
+        self.data_write(
+            [self.itr, monitor_time, analyse_time, plan_time, execute_time],
+            mode="a",
+        )
 
         self.itr += 1
         end = time.time()
