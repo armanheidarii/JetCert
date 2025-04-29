@@ -8,28 +8,24 @@
 
 ## Contents
 
-- [Introduction](#introduction)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Test](#test)
+- [Getting Started Guide](#getting-started-guide)
+- [Step-by-Step Instructions](#step-by-step-instructions)
 
-## Introduction
-A novel framework for software systems that aims to establish an optimal trade-off between system safety and feature utilization. In many self-adaptive systems, enhancing safety measures requires implementing more stringent interaction policies. However, these stricter policies often lead to feature downgrading, preventing the system from utilizing its full potential. This creates an inverse relationship between safety implementation and maximum feature utilization, where improving one aspect typically compromises the other. JetCert addresses this challenge by providing a specialized self-adaptive solution, offering unique structures and capabilities that effectively balance safety requirements with maximum system feature utilization. Through its innovative approach, JetCert enables systems to maintain robust security measures while preserving essential functionality, thereby resolving the traditional conflict between safety and feature accessibility in software systems.
+Hello, I hope you are doing well!
 
-## Installation
+Thank you for your time.
+
+In this Artifact, we have implemented a framework called JetCert. Additionally, we have implemented a self-adaptive system using JetCert, which we will proceed to install and run in the following steps.
+
+## Getting Started Guide
+To install and set up this self-adaptive system, you only need to have Docker installed on your system. You can install Docker using [this link](https://www.docker.com/)
+
+After installing Docker on your system, pull jetcert image using the command below:
 ```bash
-git clone https://github.com/armanheidarii/JetCert.git
-pip install -r self-adaptive-system/requirements.txt
+docker pull armanheids/jetcert
 ```
 
+After pulling the JetCert image, you can begin running and testing the self-adaptive system.
 
-## Usage
-```bash
-python self-adaptive-system
-```
 
-## Test
-```python
-python self-adaptive-system
-python self-adaptive-system/tests
-```
+## Step-by-Step Instructions
