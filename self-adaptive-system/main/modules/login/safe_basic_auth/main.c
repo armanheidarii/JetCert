@@ -13,9 +13,7 @@ int query_len = 1024;
 int email_len = 128;
 int password_len = 128;
 
-char db_path[] = "/home/arman/develop/compiler-artifact/jetCert/"
-                 "self-adaptive-system/main/db/data/"
-                 "jetcert.db";
+char db_path[] = "./self-adaptive-system/main/db/data/jetcert.db";
 
 struct User *user;
 
