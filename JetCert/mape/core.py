@@ -55,6 +55,22 @@ class MAPE:
         ]
         self.data_write(self.data_columns, mode="w")
 
+        source_dir = "./self-adaptive-system/experiments/"
+        target_dir = self.system.cache_folder_path
+
+        files = [
+            f
+            for f in os.listdir(source_dir)
+            if os.path.isfile(os.path.join(source_dir, f))
+        ]
+
+        import shutil
+
+        for file in files:
+            source_file = os.path.join(source_dir, file)
+            target_file = os.path.join(target_dir, file)
+            shutil.copy2(source_file, target_file)
+
     def get_period(self):
         return self.period
 
