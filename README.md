@@ -1,16 +1,5 @@
 # JetCert 🚀
 
-<p align="center">
-<img alt = "JetCert Architecture Image"
-    src="https://github.com/armanheidarii/JetCert/blob/main/JetCert/docs/JetCert-HLD.png">
-</p>
-
-
-## Contents
-
-- [Getting Started Guide](#getting-started-guide)
-- [Step-by-Step Instructions](#step-by-step-instructions)
-
 Hello, I hope you are doing well!
 
 Thank you for your time.
