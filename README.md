@@ -1,9 +1,5 @@
 # JetCert 🚀
 
-Hello, I hope you are doing well!
-
-Thank you for your time.
-
 In this Artifact, we have implemented a framework called JetCert. Additionally, we have implemented a self-adaptive system using JetCert, which we will proceed to install and run in the following steps.
 
 ## Getting Started Guide
